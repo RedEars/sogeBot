@@ -2,8 +2,8 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCaretLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import VueCompositionAPI from '@vue/composition-api';
-import BootstrapVue from 'bootstrap-vue';
 import Vue from 'vue';
+import vuetify from './vuetify' // path to vuetify export
 import VueRouter from 'vue-router';
 
 import { setLocale } from 'src/bot/helpers/dayjs';
@@ -17,7 +17,6 @@ import { store } from 'src/panel/helpers/store';
 Vue.component('fa', FontAwesomeIcon);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 
-Vue.use(BootstrapVue);
 Vue.use(VueCompositionAPI);
 
 /* import widely used components */
@@ -35,7 +34,7 @@ Vue.use(VueRouter);
 
 const main = async () => {
   await isBotStarted();
-  
+
   await getTranslations();
   store.commit('setLoggedUser', await isUserLoggedIn(false, false));
   store.commit('setConfiguration', await getConfiguration());
@@ -66,6 +65,7 @@ const main = async () => {
   new Vue({
     store,
     router,
+    vuetify,
     components: {
       navbar: () => import('./components/navbar/navbar.vue'),
       twitch: () => import('./components/twitch.vue'),
@@ -75,9 +75,13 @@ const main = async () => {
     },
     template: `
       <div id="app">
-        <navbar/>
-        <twitch/>
-        <router-view class="view"></router-view>
+        <v-app>
+          <v-main>
+            <navbar/>
+            <!--twitch/>
+            <router-view class="view"></router-view-->
+          </v-main>
+        </v-app>
       </div>
     `,
   }).$mount('#app');

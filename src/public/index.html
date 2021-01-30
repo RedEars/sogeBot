@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-  <script>
+  <!--script>
     // theme load
     const theme = localStorage.getItem('theme');
     const head = document.getElementsByTagName('head')[0];
@@ -8,7 +8,7 @@
     link.setAttribute('rel', 'stylesheet');
     link.setAttribute('href',`/dist/css/${theme || 'light'}.css`);
     head.appendChild(link);
-  </script>
+  </script-->
 
   <head>
     <title></title>
@@ -19,8 +19,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <link rel="stylesheet" href="/dist/css/light.css">
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans|Poppins|PT+Sans|PT+Sans+Narrow|PT+Mono" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
 
     <link rel="dns-prefetch" href="https://api.twitch.tv/">
     <link rel="dns-prefetch" href="https://player.twitch.tv/">
@@ -30,7 +30,7 @@
   </head>
   </style>
 
-  <body style="padding-top: 40px;">
+  <body>
     <div id="app">
       <div class="lds-hourglass"></div>
       <div id="bot-starting-intro" style="display: none" class='bot-starting-intro'></div>

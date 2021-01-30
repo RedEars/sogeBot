@@ -1,5 +1,76 @@
 <template>
-  <div class="ml-2 mr-2">
+<v-list>
+  <template v-if="isViewerLoaded && $store.state.loggedUser">
+    <v-list-item class="px-2">
+      <v-list-item-avatar>
+        <v-img :src="$store.state.loggedUser.profile_image_url"></v-img>
+      </v-list-item-avatar>
+      <v-expansion-panels flat>
+        <v-expansion-panel>
+          <v-expansion-panel-header>
+            <strong>{{$store.state.loggedUser.login}}</strong>
+            #{{$store.state.loggedUser.id}}
+          </v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <v-list-item-subtitle></v-list-item-subtitle>
+            <v-list-item-subtitle v-if="viewer.permission"><strong style="font-size: 0.9rem" class="text-muted">{{translate('group')}}:</strong>  {{viewer.permission.name}}</v-list-item-subtitle>
+              <v-list-item-subtitle style="font-size: 0.8rem" class="text-secondary">
+                <span v-for="k of viewerIs" :key="k"> {{k}} </span>
+              </v-list-item-subtitle>
+              <v-list-item-subtitle>
+                <strong style="font-size: 0.9rem" class="text-muted">{{translate('points')}}:</strong>
+                {{ Intl.NumberFormat($store.state.configuration.lang).format(viewer.points) }}
+              </v-list-item-subtitle>
+              <v-list-item-subtitle>
+                <strong style="font-size: 0.9rem" class="text-muted">{{translate('messages')}}:</strong>
+                {{ Intl.NumberFormat($store.state.configuration.lang).format(viewer.messages) }}
+              </v-list-item-subtitle>
+              <v-list-item-subtitle>
+                <strong style="font-size: 0.9rem" class="text-muted">{{translate('watched-time')}}:</strong>
+                {{ Intl.NumberFormat($store.state.configuration.lang, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(viewer.watchedTime / 1000 / 60 / 60) }} h
+              </v-list-item-subtitle>
+              <v-list-item-subtitle>
+                <strong style="font-size: 0.9rem" class="text-muted">{{translate('bits')}}:</strong>
+                {{ Intl.NumberFormat($store.state.configuration.lang).format(viewer.aggregatedBits) }}
+              </v-list-item-subtitle>
+              <v-list-item-subtitle>
+                <strong style="font-size: 0.9rem" class="text-muted">{{translate('tips')}}:</strong>
+                {{ Intl.NumberFormat($store.state.configuration.lang, { style: 'currency', currency: $store.state.configuration.currency }).format(viewer.aggregatedTips) }}
+              </v-list-item-subtitle>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
+    </v-list-item>
+
+    <v-list-item>
+      <v-list-item-content>
+        <v-item-group>
+          <v-list-item-title>
+            <v-btn block variant="secondary" v-if="isPublicPage && viewer.permission.id === defaultPermissions.CASTERS" href="/">
+              {{ translate('go-to-admin') }}
+            </v-btn>
+            <v-btn block variant="secondary" v-if="!isPublicPage" href="/public/">
+              {{ translate('go-to-public') }}
+            </v-btn>
+            <v-btn block color="error" @click="logout">
+              <fa icon="sign-out-alt" fixed-width /> {{ translate('logout') }}
+            </v-btn>
+          </v-list-item-title>
+        </v-item-group>
+      </v-list-item-content>
+    </v-list-item>
+  </template>
+  <template v-else>
+    <v-list-item link  @click="login"  class="px-2">
+      <v-list-item-avatar>
+        <fa icon="user-circle" fixed-width/>
+      </v-list-item-avatar>
+      <v-list-item-title>{{ translate('not-logged-in') }}</v-list-item-title>
+    </v-list-item>
+  </template>
+
+  </v-list>
+  <!--div class="ml-2 mr-2">
     <b-dropdown no-caret variant="light" toggle-class="btn-sm p-0 pl-1 pr-1" v-if="$store.state.loggedUser">
       <template v-slot:button-content>
         <b-img :src="$store.state.loggedUser.profile_image_url" rounded="circle" alt="Circle image" style="width:30px;"></b-img>
@@ -60,7 +131,7 @@
         {{ translate('not-logged-in') }}
       </b-button>
     </template>
-  </div>
+  </div-->
 </template>
 
 
