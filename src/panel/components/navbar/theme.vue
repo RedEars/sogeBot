@@ -2,10 +2,9 @@
   <v-list nav dense>
     <v-list-item @click="toggleTheme">
       <v-list-item-icon>
-        <fa icon="sun" fixed-width style="color: rgb(253, 177, 0)" v-if="theme === 'light'"/>
-        <fa icon="moon" fixed-width style="color: #d0d5d2" v-else/>
+        <v-icon style="color: rgb(253, 177, 0)" v-if="theme === 'light'">mdi-weather-sunny</v-icon>
+        <v-icon style="color: #d0d5d2" v-else>mdi-moon-waxing-crescent</v-icon>
       </v-list-item-icon>
-      </v-btn>
       <v-list-item-title>{{theme}}</v-list-item-title>
     </v-list-item>
   </v-list>
@@ -15,11 +14,8 @@
 import { defineComponent, ref, onMounted } from '@vue/composition-api'
 import { get } from 'lodash-es';
 
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faSun, faMoon } from '@fortawesome/free-solid-svg-icons';
 import { getSocket } from 'src/panel/helpers/socket';
 import { isUserLoggedIn } from 'src/panel/helpers/isUserLoggedIn';
-library.add(faSun, faMoon);
 
 const socket = getSocket('/core/users', true);
 
@@ -28,28 +24,23 @@ export default defineComponent({
     const theme = ref('light');
 
     const toggleTheme = () => {
-      const theme = localStorage.getItem('theme');
-      if (theme === null || theme === 'light') {
+      const _theme = localStorage.getItem('theme');
+      if (_theme === null || _theme === 'light') {
         localStorage.setItem('theme', 'dark')
       }
-      if (theme === 'dark') {
+      if (_theme === 'dark') {
         localStorage.setItem('theme', 'light');
       }
       loadTheme(localStorage.getItem('theme') || 'dark');
     }
 
     const loadTheme = async (themeArg: string) => {
-      console.error('loadTheme is currently disabled')
-      /*
       if (!['light', 'dark'].includes(themeArg)) {
         console.error(`Unknown theme ${themeArg}, setting light theme`);
         themeArg = 'light';
       }
-      const head = document.getElementsByTagName('head')[0];
-      const link = (document.createElement('link') as any);
-      link.setAttribute('rel', 'stylesheet');
-      link.setAttribute('href',`/dist/css/${themeArg}.css`);
-      head.appendChild(link);
+
+      context.root.$vuetify.theme.dark = themeArg === 'dark';
       theme.value = themeArg;
 
       // we need to save users preferred theme
@@ -58,7 +49,6 @@ export default defineComponent({
         socket.emit('theme::set', { theme: themeArg, userId: user.id}, () => {});
       }
       localStorage.setItem('theme', themeArg);
-      */
     }
 
     onMounted(async () => {

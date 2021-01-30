@@ -1,6 +1,6 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
-  faSpotify, faTwitch, faTwitter, 
+  faSpotify, faTwitch, faTwitter,
 } from '@fortawesome/free-brands-svg-icons';
 import {
   faBell, faCalendar, faCheckCircle, faCircle, faClock, faMoneyBillAlt,
@@ -31,7 +31,6 @@ import { setLocale } from 'src/bot/helpers/dayjs';
 import { ButtonStates, states } from 'src/panel/helpers/buttonStates';
 import type { getListOfReturn } from 'src/panel/helpers/getListOf';
 import { getListOf, populateListOf } from 'src/panel/helpers/getListOf';
-import { setMainLoaded } from 'src/panel/helpers/isAvailableVariable';
 import { isUserLoggedIn } from 'src/panel/helpers/isUserLoggedIn';
 import { getConfiguration, getTranslations } from 'src/panel/helpers/socket';
 import urlParam from 'src/panel/helpers/urlParam';
@@ -72,7 +71,7 @@ Vue.use(VueRouter);
 
 const main = async () => {
   await isBotStarted();
-  
+
   // init prototypes
   Vue.prototype.urlParam = (v: string) => urlParam(v);
   store.commit('setLoggedUser', await isUserLoggedIn());
@@ -87,7 +86,6 @@ const main = async () => {
     Vue.prototype.$systems = getListOf('systems');
     Vue.prototype.$integrations = await getListOf('integrations');
     Vue.prototype.$state = ButtonStates;
-    setMainLoaded();
 
     const router = new VueRouter({
       mode:   'hash',

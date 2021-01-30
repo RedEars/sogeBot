@@ -7,7 +7,6 @@ import VueRouter from 'vue-router';
 
 import { setLocale } from 'src/bot/helpers/dayjs';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
-import { setMainLoaded } from 'src/panel/helpers/isAvailableVariable';
 import { isBotStarted } from 'src/panel/helpers/isBotStarted';
 import { isUserLoggedIn } from 'src/panel/helpers/isUserLoggedIn';
 import { getConfiguration, getTranslations } from 'src/panel/helpers/socket';
@@ -28,22 +27,12 @@ library.add(faCaretLeft);
 
 export interface Global {
   configuration: any;
-  isMainLoaded?: boolean;
 }
 
 Vue.use(VueRouter);
 
 const main = async () => {
-  await isBotStarted();
-
-  await getTranslations();
-  store.commit('setLoggedUser', await isUserLoggedIn(false, false));
-  store.commit('setConfiguration', await getConfiguration());
-
   Vue.prototype.$state = ButtonStates;
-
-  setMainLoaded();
-
   const router = new VueRouter({
     mode:   'hash',
     base:   __dirname,
@@ -63,7 +52,7 @@ const main = async () => {
     ],
   });
 
-  new Vue({
+  const VueApp = new Vue({
     store,
     router,
     vuetify,
@@ -71,19 +60,41 @@ const main = async () => {
       navbar: () => import('./components/navbar/navbar.vue'),
       twitch: () => import('./components/twitch.vue'),
     },
-    created() {
-      setLocale(this.$store.state.configuration.lang);
-    },
     template: `
       <v-app id="app">
-        <navbar/>
-        <v-main>
-          <twitch/>
-          <router-view class="view"></router-view>
-        </v-main>
+        <template v-if="$store.state.isUILoaded">
+          <navbar/>
+          <v-main>
+            <twitch/>
+            <router-view class="view"></router-view>
+          </v-main>
+        </template>
+        <v-overlay :value="!$store.state.isUILoaded" :dark="$vuetify.theme.dark">
+          <v-row>
+            <v-col class="text-center">
+              <v-progress-circular indeterminate size="48"></v-progress-circular>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col class="font-weight-light">
+              {{ $store.state.loadingMsg }}
+            </v-col>
+          </v-row>
+        </v-overlay>
       </v-app>
     `,
   }).$mount('#app');
+
+  VueApp.$vuetify.theme.dark = (localStorage.getItem('theme') || 'dark') === 'dark';
+
+  await isBotStarted();
+  await getTranslations();
+  store.commit('setLoggedUser', await isUserLoggedIn(false, false));
+
+  const configuration = await getConfiguration();
+  store.commit('setConfiguration', configuration);
+  setLocale(configuration.lang as string);
+  store.commit('setUILoaded');
 };
 
 main();

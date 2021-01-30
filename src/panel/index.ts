@@ -3,7 +3,7 @@ import LoadScript from 'vue-plugin-load-script';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
-  faSpotify, faTwitch, faTwitter, 
+  faSpotify, faTwitch, faTwitter,
 } from '@fortawesome/free-brands-svg-icons';
 import {
   faBell, faCalendar, faCheckCircle, faCircle, faClock, faMoneyBillAlt,
@@ -34,7 +34,6 @@ import { setLocale } from 'src/bot/helpers/dayjs';
 import { ButtonStates, states } from './helpers/buttonStates';
 import type { getListOfReturn } from './helpers/getListOf';
 import { getListOf, populateListOf } from './helpers/getListOf';
-import { setMainLoaded } from './helpers/isAvailableVariable';
 import { isBotStarted } from './helpers/isBotStarted';
 import { isUserLoggedIn } from './helpers/isUserLoggedIn';
 import { getConfiguration, getTranslations } from './helpers/socket';
@@ -96,7 +95,6 @@ const main = async () => {
     });
 
     Vue.prototype.$state = ButtonStates;
-    setMainLoaded();
 
     const router = new VueRouter({
       mode:   'hash',

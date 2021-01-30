@@ -1,6 +1,6 @@
 <template>
   <v-container fluid style="min-height: calc(100vh);" ref="playlistRef">
-    <h3>{{ translate('menu.playlist') }}</h3>
+    <h2>{{ translate('menu.playlist') }}</h2>
 
     <v-pagination v-model="currentPage" :length="Math.ceil(count / perPage)"/>
 
@@ -23,27 +23,6 @@
 
     <v-pagination v-model="currentPage" :length="Math.ceil(count / perPage)"/>
   </v-container>
-   <!--
-  b-container(ref="playlistRef" style="min-height: calc(100vh - 49px);").fluid.pt-2
-    b-row
-      b-col
-        span.title.text-default.mb-2 {{ translate('menu.playlist') }}
-
-    panel
-      template(v-slot:left)
-        button-with-icon(icon="caret-left" href="#/").btn-secondary.btn-reverse {{translate('commons.back')}}
-      template(v-slot:right)
-        b-pagination(
-          v-model="currentPage"
-          :total-rows="count"
-          :per-page="perPage"
-          ).m-0
-
-    loading(v-if="state.loading !== $state.success")
-    b-table(v-else striped small :items="playlist" :fields="fields" @row-clicked="linkTo($event)").table-p-0
-      template(v-slot:cell(thumbnail)="data")
-        img(v-bind:src="generateThumbnail(data.item.videoId)").float-left.pr-3
-        -->
 </template>
 
 <script lang="ts">
