@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid fill-height style='padding: 0; max-height: 100vh;'>
+  <v-container fluid style='padding: 0; height: 100vh;'>
     <v-row no-gutters style="height: 100%">
       <v-col cols="12" md="9" lg="9" xl="10">
         <v-alert

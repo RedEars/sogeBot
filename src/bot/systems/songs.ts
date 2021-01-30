@@ -3,21 +3,21 @@ import { setInterval } from 'timers';
 import * as _ from 'lodash';
 import io from 'socket.io';
 import {
-  Brackets, getConnection, getRepository, 
+  Brackets, getConnection, getRepository,
 } from 'typeorm';
 import ytdl from 'ytdl-core';
 import ytpl from 'ytpl';
 import ytsr from 'ytsr';
 
 import {
-  SongBan, SongPlaylist, SongPlaylistInterface, SongRequest, 
+  SongBan, SongPlaylist, SongPlaylistInterface, SongRequest,
 } from '../database/entity/song';
 import {
-  command, default_permission, persistent, settings, ui, 
+  command, default_permission, persistent, settings, ui,
 } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import {
-  announce, getBot, getBotSender, prepare, 
+  announce, getBot, getBotSender, prepare,
 } from '../helpers/commons';
 import { error, info } from '../helpers/log';
 import { defaultPermissions } from '../helpers/permissions/';
@@ -113,12 +113,13 @@ class Songs extends System {
         cb(e, []);
       }
     });
-    publicEndpoint(this.nsp, 'find.playlist', async (opts: { page?: number; search?: string, tag?: string }, cb) => {
+    publicEndpoint(this.nsp, 'find.playlist', async (opts: { perPage?: number, page?: number; search?: string, tag?: string }, cb) => {
       const connection = await getConnection();
       opts.page = opts.page ?? 0;
+      opts.perPage = opts.perPage ?? 25;
       const query = getRepository(SongPlaylist).createQueryBuilder('playlist')
-        .offset(opts.page * 25)
-        .limit(25);
+        .offset(opts.page * opts.perPage)
+        .limit(opts.perPage);
 
       if (typeof opts.search !== 'undefined') {
         query.andWhere(new Brackets(w => {

@@ -66,7 +66,7 @@ const main = async () => {
           <navbar/>
           <v-main>
             <twitch/>
-            <router-view class="view"></router-view>
+            <router-view></router-view>
           </v-main>
         </template>
         <v-overlay :value="!$store.state.isUILoaded" :dark="$vuetify.theme.dark">

@@ -1,13 +1,29 @@
-<template lang="pug">
-  b-container(ref="quotesRef" style="min-height: calc(100vh - 49px);").fluid.pt-2
-    b-row
-      b-col
-        span.title.text-default.mb-2 {{ translate('menu.quotes') }}
+<template>
+  <v-container ref="quotesRef" style='min-height: 100vh'>
+    <h2>{{ translate('menu.quotes') }}</h2>
 
-    panel
-      template(v-slot:left)
-        button-with-icon(icon="caret-left" href="#/").btn-secondary.btn-reverse {{translate('commons.back')}}
+    <v-text-field
+      v-model="search"
+      append-icon="mdi-magnify"
+      label="Search"
+      single-line
+      hide-details
+    ></v-text-field>
 
+    <v-data-table
+      :loading="state.loading !== $state.success"
+      :headers="headers"
+      :search="search"
+      :items="items"
+    >
+      <template v-slot:[`item.createdAt`]="{ item }">
+        {{ dayjs(item.createdAt).format('LL')}} {{ dayjs(item.createdAt).format('LTS') }}
+      </template>
+      <template v-slot:[`item.tags`]="{ item }">
+        <v-chip v-for="tag of item.tags" v-bind:key="tag" small color="orange" class="ma-1">{{ tag }}</v-chip>
+      </template>
+    </v-data-table>
+<!--
     loading(v-if="state.loading !== $state.success")
     b-table(v-else striped small :items="items" :fields="fields").table-p-0
       template(v-slot:cell(createdAt)="data") {{ dayjs(data.item.createdAt).format('LL')}} {{ dayjs(data.item.createdAt).format('LTS') }}
@@ -15,6 +31,8 @@
         span(style="word-break: break-word;") {{ data.item.quote }}
       template(v-slot:cell(tags)="data")
         span(v-for="tag of data.item.tags" v-bind:key="tag" variant="dark").p-2.m-1.text-light.bg-dark {{ tag }}
+        -->
+  </v-container>
 </template>
 
 <script lang="ts">
@@ -36,6 +54,7 @@ export default defineComponent({
   setup(props, ctx) {
     const items = ref([] as QuotesInterface[]);
     const quotesRef = ref(null as Element | null);
+    const search = ref('');
 
     const state = ref({
       loading: ButtonStates.progress,
@@ -43,20 +62,17 @@ export default defineComponent({
       loading: number;
     })
 
-    const fields = [
-      { key: 'createdAt', label: translate('systems.quotes.date.name'), sortable: true },
-      { key: 'quote', label: translate('systems.quotes.quote.name'), sortable: true },
-      { key: 'tags', label: translate('systems.quotes.tags.name') },
-      { key: 'quotedByName', label: translate('systems.quotes.by.name'), sortable: true },
-      // virtual attributes
-      { key: 'buttons', label: '' },
+    const headers = [
+      { value: 'createdAt', text: translate('systems.quotes.date.name') },
+      { value: 'quote', text: translate('systems.quotes.quote.name') },
+      { value: 'tags', text: translate('systems.quotes.tags.name') },
+      { value: 'quotedByName', text: translate('systems.quotes.by.name') },
     ]
 
     const moveTo = () => {
       VueScrollTo.scrollTo(quotesRef.value as Element, 500, {
         container: 'body',
         force: true,
-        offset: -49,
         onDone: function() {
           const scrollPos = window.scrollY || document.getElementsByTagName("html")[0].scrollTop;
           if (scrollPos === 0) {
@@ -80,7 +96,8 @@ export default defineComponent({
 
     return {
       dayjs,
-      fields,
+      search,
+      headers,
       items,
       state,
       translate,

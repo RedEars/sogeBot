@@ -1,27 +1,27 @@
 <template>
-  <v-container fluid style="min-height: calc(100vh);" ref="playlistRef">
+  <v-container ref="playlistRef" style='min-height: 100vh'>
     <h2>{{ translate('menu.playlist') }}</h2>
+    <v-text-field
+      v-model="search"
+      append-icon="mdi-magnify"
+      label="Search"
+      single-line
+      hide-details
+    ></v-text-field>
 
-    <v-pagination v-model="currentPage" :length="Math.ceil(count / perPage)"/>
-
-    <v-simple-table>
-      <template v-slot:default>
-        <tbody>
-          <tr
-            @click="linkTo(item)"
-            v-for="item in playlist"
-            :key="item.videoId"
-          >
-            <td>
-              <v-img class="fitThumbnail" :src="generateThumbnail(item.videoId)"></v-img>
-            </td>
-            <td>{{ item.title }}</td>
-          </tr>
-        </tbody>
+    <v-data-table
+      :server-items-length="count"
+      hide-default-header
+      :loading="state.loading !== $state.success"
+      :headers="headers"
+      :options.sync="options"
+      :items="playlist"
+      @click:row="linkTo($event)"
+    >
+      <template v-slot:[`item.thumbnail`]="{ item }">
+        <v-img class="fitThumbnail" :src="generateThumbnail(item.videoId)"></v-img>
       </template>
-    </v-simple-table>
-
-    <v-pagination v-model="currentPage" :length="Math.ceil(count / perPage)"/>
+    </v-data-table>
   </v-container>
 </template>
 
@@ -42,9 +42,9 @@ export default defineComponent({
   },
   setup(props, ctx) {
     const playlist = ref([] as SongPlaylistInterface[]);
+    const search = ref('');
 
-    const currentPage = ref(1);
-    const perPage = ref(25);
+    const options = ref({} as { sortBy?: string, sortDesc?: string, page?: number, itemsPerPage?: number });
     const count = ref(0);
 
     const playlistRef = ref(null as Element | null);
@@ -55,18 +55,23 @@ export default defineComponent({
       loading: number;
     })
 
-    const fields = [
-      { key: 'thumbnail', label: '', tdClass: 'fitThumbnail' },
-      { key: 'title', label: '' },
-      { key: 'buttons', label: '' },
+    const headers = [
+      { value: 'thumbnail', label: '', tdClass: 'fitThumbnail' },
+      { value: 'title', label: '' },
     ];
+
     const refreshPlaylist = () => {
       state.value.loading = ButtonStates.progress;
       socket.emit('current.playlist.tag', (err1: string | null, tag: string) => {
         if (err1) {
           return console.error(err1);
         }
-        socket.emit('find.playlist', { page: (currentPage.value - 1), tag }, (err: string | null, items: SongPlaylistInterface[], countOfItems: number) => {
+        socket.emit('find.playlist', {
+          perPage: (options.value.itemsPerPage ?? 1),
+          page: ((options.value.page ?? 1) - 1),
+          tag,
+          search: search.value,
+        }, (err: string | null, items: SongPlaylistInterface[], countOfItems: number) => {
           if (err) {
             return console.error(err);
           }
@@ -94,7 +99,7 @@ export default defineComponent({
       })
     }
 
-    watch(currentPage, () => refreshPlaylist());
+    watch([options, search], () => refreshPlaylist(), { deep: true });
 
     onMounted(() => {
       refreshPlaylist();
@@ -115,24 +120,22 @@ export default defineComponent({
     return {
       linkTo,
       generateThumbnail,
-      fields,
-      perPage,
+      headers,
       count,
-      currentPage,
       playlistRef,
       state,
       translate,
       playlist,
+      options,
+      search,
     }
   }
 });
   </script>
 
 <style>
-.table-p-0 td {
-  padding: 0 !important;
-}
 .fitThumbnail {
   width: 100px;
+  margin: 2px;
 }
 </style>
