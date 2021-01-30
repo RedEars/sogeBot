@@ -23,15 +23,6 @@
         <v-chip v-for="tag of item.tags" v-bind:key="tag" small color="orange" class="ma-1">{{ tag }}</v-chip>
       </template>
     </v-data-table>
-<!--
-    loading(v-if="state.loading !== $state.success")
-    b-table(v-else striped small :items="items" :fields="fields").table-p-0
-      template(v-slot:cell(createdAt)="data") {{ dayjs(data.item.createdAt).format('LL')}} {{ dayjs(data.item.createdAt).format('LTS') }}
-      template(v-slot:cell(quote)="data")
-        span(style="word-break: break-word;") {{ data.item.quote }}
-      template(v-slot:cell(tags)="data")
-        span(v-for="tag of data.item.tags" v-bind:key="tag" variant="dark").p-2.m-1.text-light.bg-dark {{ tag }}
-        -->
   </v-container>
 </template>
 
