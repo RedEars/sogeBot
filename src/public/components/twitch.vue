@@ -1,10 +1,12 @@
 <template>
-  <b-container fluid class="w-100 p-0" style="height: calc(100vh - 40px) !important">
-    <b-row no-gutters style="height: 100%">
-      <b-col cols="12" md="9" lg="9" xl="10">
-        <b-alert variant="danger" v-if="!isHttps" show>
-          You need to run this page on HTTPS with valid certificate for this embed to be working. Ask your streamer to run on HTTPS.
-        </b-alert>
+  <v-container fluid fill-height style='padding: 0; max-height: 100vh;'>
+    <v-row no-gutters style="height: 100%">
+      <v-col cols="12" md="9" lg="9" xl="10">
+        <v-alert
+          color="red"
+          type="error"
+          v-if="!isHttps"
+        > You need to run this page on HTTPS with valid certificate for this embed to be working. Ask your streamer to run on HTTPS.</v-alert>
         <iframe
           v-else
           :src="videoUrl"
@@ -14,17 +16,17 @@
           scrolling="no"
           allowfullscreen="true">
         </iframe>
-      </b-col>
-      <b-col cols="0" md="3" lg="3" xl="2">
+      </v-col>
+      <v-col cols="0" md="3" lg="3" xl="2">
         <iframe frameborder="0"
           scrolling="no"
           :src="chatUrl"
           height="100%"
           width="100%">
         </iframe>
-      </b-col>
-    </b-row>
-  </b-container>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script lang="ts">

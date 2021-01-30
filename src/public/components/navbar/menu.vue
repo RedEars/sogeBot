@@ -2,7 +2,7 @@
   <v-list nav dense>
     <v-list-item :key="item.name" v-for="item of menu" :href="'#/' + item.id.replace(/\./g, '/')">
       <v-list-item-icon>
-        <v-icon>mdi-folder</v-icon>
+        <v-icon>{{icons.get(item.name)}}</v-icon>
       </v-list-item-icon>
       <v-list-item-title>{{translate('menu.' + item.name)}}</v-list-item-title>
     </v-list-item>
@@ -17,6 +17,13 @@ import translate from 'src/panel/helpers/translate';
 import type { menuPublic } from 'src/bot/helpers/panel';
 
 const socket = getSocket('/');
+
+const icons = new Map<string, string>([
+  ['dashboard', 'mdi-view-dashboard'],
+  ['playlist', 'mdi-playlist-music'],
+  ['quotes', 'mdi-comment-quote'],
+  ['songs', 'mdi-playlist-play'],
+]);
 
 export default defineComponent({
   setup() {
@@ -42,7 +49,7 @@ export default defineComponent({
         }
       });
     });
-  return { menu, translate }
+  return { menu, translate, icons }
   }
 })
 </script>

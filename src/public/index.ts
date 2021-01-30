@@ -3,7 +3,6 @@ import { faCaretLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import VueCompositionAPI from '@vue/composition-api';
 import Vue from 'vue';
-import vuetify from './vuetify' // path to vuetify export
 import VueRouter from 'vue-router';
 
 import { setLocale } from 'src/bot/helpers/dayjs';
@@ -13,6 +12,8 @@ import { isBotStarted } from 'src/panel/helpers/isBotStarted';
 import { isUserLoggedIn } from 'src/panel/helpers/isUserLoggedIn';
 import { getConfiguration, getTranslations } from 'src/panel/helpers/socket';
 import { store } from 'src/panel/helpers/store';
+
+import vuetify from './vuetify'; // path to vuetify export
 
 Vue.component('fa', FontAwesomeIcon);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
@@ -74,15 +75,13 @@ const main = async () => {
       setLocale(this.$store.state.configuration.lang);
     },
     template: `
-      <div id="app">
-        <v-app>
-          <v-main>
-            <navbar/>
-            <!--twitch/>
-            <router-view class="view"></router-view-->
-          </v-main>
-        </v-app>
-      </div>
+      <v-app id="app">
+        <navbar/>
+        <v-main>
+          <twitch/>
+          <router-view class="view"></router-view>
+        </v-main>
+      </v-app>
     `,
   }).$mount('#app');
 };

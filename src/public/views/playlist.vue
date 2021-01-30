@@ -1,4 +1,29 @@
-<template lang="pug">
+<template>
+  <v-container fluid style="min-height: calc(100vh);" ref="playlistRef">
+    <h3>{{ translate('menu.playlist') }}</h3>
+
+    <v-pagination v-model="currentPage" :length="Math.ceil(count / perPage)"/>
+
+    <v-simple-table>
+      <template v-slot:default>
+        <tbody>
+          <tr
+            @click="linkTo(item)"
+            v-for="item in playlist"
+            :key="item.videoId"
+          >
+            <td>
+              <v-img class="fitThumbnail" :src="generateThumbnail(item.videoId)"></v-img>
+            </td>
+            <td>{{ item.title }}</td>
+          </tr>
+        </tbody>
+      </template>
+    </v-simple-table>
+
+    <v-pagination v-model="currentPage" :length="Math.ceil(count / perPage)"/>
+  </v-container>
+   <!--
   b-container(ref="playlistRef" style="min-height: calc(100vh - 49px);").fluid.pt-2
     b-row
       b-col
@@ -18,6 +43,7 @@
     b-table(v-else striped small :items="playlist" :fields="fields" @row-clicked="linkTo($event)").table-p-0
       template(v-slot:cell(thumbnail)="data")
         img(v-bind:src="generateThumbnail(data.item.videoId)").float-left.pr-3
+        -->
 </template>
 
 <script lang="ts">
@@ -80,7 +106,6 @@ export default defineComponent({
       VueScrollTo.scrollTo(playlistRef.value as Element, 500, {
         container: 'body',
         force: true,
-        offset: -49,
         onDone: function() {
           const scrollPos = window.scrollY || document.getElementsByTagName("html")[0].scrollTop;
           if (scrollPos === 0) {
