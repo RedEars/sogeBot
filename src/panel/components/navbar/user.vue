@@ -1,14 +1,64 @@
 <template>
 <v-list nav dense>
   <template v-if="isViewerLoaded && $store.state.loggedUser">
-    <v-list-item class="px-0">
+    <v-list-item class="px-0" style="height: 72px">
       <v-list-item-avatar>
         <v-avatar>
           <v-img :src="$store.state.loggedUser.profile_image_url"></v-img>
         </v-avatar>
       </v-list-item-avatar>
+      <v-list-item-content>
+        <div class="font-weight-medium">{{$store.state.loggedUser.login}}</div>
+        <div class="font-weight-thin" v-if="viewer.permission">{{viewer.permission.name}}</div>
+        <v-list-item-subtitle>
+          <v-chip v-for="k of viewerIs" :key="k" x-small pill color="orange"> {{k}} </v-chip>
+        </v-list-item-subtitle>
+      </v-list-item-content>
+    </v-list-item>
 
-      <v-menu
+    <v-list-item style="height: 120px">
+      <div/>
+      <v-container style="font-size: .8125rem;" class="ma-0 pa-0">
+        <v-row>
+          <v-col class="font-weight-medium text-center pa-1">
+            {{ Intl.NumberFormat($store.state.configuration.lang).format(viewer.points) }}
+            <div class="font-weight-thin">{{translate('points')}}</div>
+          </v-col>
+          <v-col class="font-weight-medium text-center pa-1">
+            {{ Intl.NumberFormat($store.state.configuration.lang).format(viewer.messages) }}
+            <div class="font-weight-thin">{{translate('messages')}}</div>
+          </v-col>
+          <v-col class="font-weight-medium text-center pa-1">
+            {{ Intl.NumberFormat($store.state.configuration.lang).format(viewer.aggregatedBits) }}
+            <div class="font-weight-thin">{{translate('bits')}}</div>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col class="font-weight-medium text-center pa-1">
+            {{ Intl.NumberFormat($store.state.configuration.lang, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(viewer.watchedTime / 1000 / 60 / 60) }} h
+            <div class="font-weight-thin">{{translate('watched-time')}}</div>
+          </v-col>
+          <v-col class="font-weight-medium text-center pa-1">
+            {{ Intl.NumberFormat($store.state.configuration.lang, { style: 'currency', currency: $store.state.configuration.currency }).format(viewer.aggregatedTips) }}
+            <div class="font-weight-thin">{{translate('tips')}}</div>
+          </v-col>
+          <v-col class="font-weight-medium text-center pa-1"></v-col>
+        </v-row>
+
+        <div class="pt-3 text-center">
+          <v-btn color='error' @click="logout" x-small>
+            {{ translate('logout') }}
+          </v-btn>
+          <v-btn v-if="isPublicPage && viewer.permission.id === defaultPermissions.CASTERS" href="/"  x-small>
+            {{ translate('go-to-admin') }}
+          </v-btn>
+          <v-btn v-if="!isPublicPage" href="/public/"  x-small>
+            {{ translate('go-to-public') }}
+          </v-btn>
+        </div>
+      </v-container>
+    </v-list-item>
+      <!--v-menu
         v-model="menu"
         :close-on-content-click="false"
         :nudge-width="200"
@@ -59,20 +109,8 @@
             <template v-slot:default>
               <tbody>
                 <tr>
-                  <td>{{translate('points')}}</td>
-                  <td>{{ Intl.NumberFormat($store.state.configuration.lang).format(viewer.points) }}</td>
-                </tr>
-                <tr>
-                  <td>{{translate('messages')}}</td>
-                  <td>{{ Intl.NumberFormat($store.state.configuration.lang).format(viewer.messages) }}</td>
-                </tr>
-                <tr>
                   <td>{{translate('watched-time')}}</td>
                   <td>{{ Intl.NumberFormat($store.state.configuration.lang, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(viewer.watchedTime / 1000 / 60 / 60) }} h</td>
-                </tr>
-                <tr>
-                  <td>{{translate('bits')}}</td>
-                  <td>{{ Intl.NumberFormat($store.state.configuration.lang).format(viewer.aggregatedBits) }}</td>
                 </tr>
                 <tr>
                   <td>{{translate('tips')}}</td>
@@ -93,7 +131,7 @@
             </v-btn>
           </v-card-actions>
         </v-card>
-      </v-menu>
+      </v-menu-->
     </v-list-item>
   </template>
   <template v-else>
