@@ -1,11 +1,13 @@
 <template>
   <v-navigation-drawer permanent expand-on-hover app>
     <vue-headful :title='name.toUpperCase() + " @ " + channelName'/>
-    <user/>
-    <v-divider></v-divider>
     <navmenu/>
     <v-divider></v-divider>
     <theme/>
+
+    <template v-slot:append>
+      <user/>
+    </template>
     </v-navigation-drawer>
 </template>
 

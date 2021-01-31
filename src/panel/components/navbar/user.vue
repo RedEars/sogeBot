@@ -1,22 +1,7 @@
 <template>
 <v-list nav dense>
   <template v-if="isViewerLoaded && $store.state.loggedUser">
-    <v-list-item class="px-0" style="height: 72px">
-      <v-list-item-avatar>
-        <v-avatar>
-          <v-img :src="$store.state.loggedUser.profile_image_url"></v-img>
-        </v-avatar>
-      </v-list-item-avatar>
-      <v-list-item-content>
-        <div class="font-weight-medium">{{$store.state.loggedUser.login}}</div>
-        <div class="font-weight-thin" v-if="viewer.permission">{{viewer.permission.name}}</div>
-        <v-list-item-subtitle>
-          <v-chip v-for="k of viewerIs" :key="k" x-small pill color="orange"> {{k}} </v-chip>
-        </v-list-item-subtitle>
-      </v-list-item-content>
-    </v-list-item>
-
-    <v-list-item style="height: 120px">
+    <v-list-item style="height: 120px" transition="fade-transition">
       <div/>
       <v-container style="font-size: .8125rem;" class="ma-0 pa-0">
         <v-row>
@@ -44,108 +29,49 @@
           </v-col>
           <v-col class="font-weight-medium text-center pa-1"></v-col>
         </v-row>
-
-        <div class="pt-3 text-center">
-          <v-btn color='error' @click="logout" x-small>
-            {{ translate('logout') }}
-          </v-btn>
-          <v-btn v-if="isPublicPage && viewer.permission.id === defaultPermissions.CASTERS" href="/"  x-small>
-            {{ translate('go-to-admin') }}
-          </v-btn>
-          <v-btn v-if="!isPublicPage" href="/public/"  x-small>
-            {{ translate('go-to-public') }}
-          </v-btn>
-        </div>
       </v-container>
     </v-list-item>
-      <!--v-menu
-        v-model="menu"
-        :close-on-content-click="false"
-        :nudge-width="200"
-        offset-x
-      >
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn
-            v-bind="attrs"
-            v-on="on"
-            plain
-          >
-            {{$store.state.loggedUser.login}}
-          </v-btn>
-        </template>
 
-        <v-card>
-          <v-list>
-            <v-list-item>
-              <v-list-item-avatar>
-                <v-avatar>
-                  <v-img :src="$store.state.loggedUser.profile_image_url"></v-img>
-                </v-avatar>
-              </v-list-item-avatar>
+    <v-list-item class="px-0" style="height: 72px">
+      <v-list-item-avatar>
+        <v-avatar>
+          <v-img :src="$store.state.loggedUser.profile_image_url"></v-img>
+        </v-avatar>
+      </v-list-item-avatar>
+      <v-list-item-content>
+        <div class="font-weight-medium">{{$store.state.loggedUser.login}}</div>
+        <div class="font-weight-thin" v-if="viewer.permission">{{viewer.permission.name}}</div>
+        <v-list-item-subtitle>
+          <v-chip v-for="k of viewerIs" :key="k" x-small pill color="orange"> {{k}} </v-chip>
+        </v-list-item-subtitle>
+      </v-list-item-content>
+    </v-list-item>
 
-              <v-list-item-content>
-                <v-list-item-title>{{$store.state.loggedUser.login}}</v-list-item-title>
-                <v-list-item-subtitle v-if="viewer.permission">{{viewer.permission.name}}</v-list-item-subtitle>
-                <v-list-item-subtitle>
-                  <v-chip v-for="k of viewerIs" :key="k"> {{k}} </v-chip>
-                </v-list-item-subtitle>
-              </v-list-item-content>
-
-              <v-list-item-action>
-                <v-btn
-                  class="red--text"
-                  icon
-                  @click="logout"
-                >
-                  <v-icon>mdi-logout</v-icon>
-                </v-btn>
-              </v-list-item-action>
-            </v-list-item>
-          </v-list>
-
-          <v-divider></v-divider>
-
-          <v-simple-table dense>
-            <template v-slot:default>
-              <tbody>
-                <tr>
-                  <td>{{translate('watched-time')}}</td>
-                  <td>{{ Intl.NumberFormat($store.state.configuration.lang, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(viewer.watchedTime / 1000 / 60 / 60) }} h</td>
-                </tr>
-                <tr>
-                  <td>{{translate('tips')}}</td>
-                  <td>{{ Intl.NumberFormat($store.state.configuration.lang, { style: 'currency', currency: $store.state.configuration.currency }).format(viewer.aggregatedTips) }}</td>
-                </tr>
-              </tbody>
-            </template>
-          </v-simple-table>
-
-          <v-card-actions>
-            <v-spacer></v-spacer>
-
-            <v-btn v-if="isPublicPage && viewer.permission.id === defaultPermissions.CASTERS" href="/">
-              {{ translate('go-to-admin') }}
-            </v-btn>
-            <v-btn v-if="!isPublicPage" href="/public/">
-              {{ translate('go-to-public') }}
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-menu-->
+    <v-list-item v-if="!isPublicPage" href="/public/" class="mt-3">
+      <v-list-item-icon>
+        <v-icon>mdi-earth</v-icon>
+      </v-list-item-icon>
+      <v-list-item-title>{{ translate('go-to-public') }}</v-list-item-title>
+    </v-list-item>
+    <v-list-item v-if="isPublicPage && viewer.permission.id === defaultPermissions.CASTERS" href="/" class="mt-3">
+      <v-list-item-icon>
+        <v-icon>mdi-account-cog</v-icon>
+      </v-list-item-icon>
+      <v-list-item-title>{{ translate('go-to-admin') }}</v-list-item-title>
+    </v-list-item>
+    <v-list-item color="red" @click="logout">
+      <v-list-item-icon>
+        <v-icon class="red--text">mdi-logout</v-icon>
+      </v-list-item-icon>
+      <v-list-item-title>{{ translate('logout') }}</v-list-item-title>
     </v-list-item>
   </template>
   <template v-else>
-    <v-list-item  class="px-2">
+    <v-list-item @click="logout">
       <v-list-item-icon>
-        <v-icon>mdi-account-circle</v-icon>
+        <v-icon>mdi-login</v-icon>
       </v-list-item-icon>
-      <v-list-item-title>
-      <v-btn
-        @click="login"
-        plain
-      >
-        {{ translate('not-logged-in') }}
-      </v-btn></v-list-item-title>
+      <v-list-item-title>{{ translate('not-logged-in') }}</v-list-item-title>
     </v-list-item>
   </template>
   </v-list>
