@@ -44,7 +44,12 @@ export const setApp = (_app: express.Application) => {
 export const setServer = () => {
   if (app) {
     server = http.createServer(app);
-    ioServer = new io(server);
+    ioServer = new io(server, {
+      cors: {
+        origin:  '*',
+        methods: ['GET', 'POST'],
+      },
+    });
     ioServer.sockets.setMaxListeners(200);
 
     if (process.env.CA_CERT && process.env.CA_KEY) {

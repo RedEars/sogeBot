@@ -18,7 +18,8 @@
       "not-available": "not available"
     },
     "percentage": {
-      "true": "", "false": ""
+      "true": "",
+      "false": ""
     },
     "years": "year|years",
     "months": "month|months",
@@ -28,6 +29,7 @@
     "seconds": "second|seconds",
     "messages": "message|messages",
     "bits": "bit|bits",
+    "feedAmount": "g Feeded",
     "links": "link|links",
     "entries": "entry|entries",
     "empty": "empty",
@@ -282,7 +284,7 @@
           "label": "Number to decrement",
           "placeholder": ""
         },
-        "":"",
+        "": "",
         "titleOfReward": {
           "label": "Title of redeemed reward",
           "placeholder": ""
@@ -369,7 +371,7 @@
         "items": "Items",
         "bits": "Bits",
         "subgifts": "Subgifts",
-        "subStreakShareEnabled" : "Is substreak share enabled (true/false)",
+        "subStreakShareEnabled": "Is substreak share enabled (true/false)",
         "subStreak": "Current sub streak",
         "subStreakName": "localized name of month (1 month, 2 months) for current sub strek",
         "subCumulativeMonths": "Cumulative subscribe months",
@@ -822,11 +824,9 @@
   },
   "raffles": {
     "announceInterval": "Opened raffles will be announced every $value minute",
-
     "eligibility-followers-item": "followers",
     "eligibility-subscribers-item": "subscribers",
     "eligibility-everyone-item": "everyone",
-
     "raffle-is-running": "Raffle is running ($count $l10n_entries).",
     "to-enter-raffle": "To enter type \"$keyword\". Raffle is opened for $eligibility.",
     "to-enter-ticket-raffle": "To enter type \"$keyword <$min-$max>\". Raffle is opened for $eligibility.",
@@ -837,34 +837,32 @@
     "announce-ticket-raffle": "{raffles.raffle-is-running} {raffles.to-enter-ticket-raffle}",
     "announce-new-entries": "{raffles.added-entries} {raffles.to-enter-raffle}",
     "announce-new-ticket-entries": "{raffles.added-entries} {raffles.to-enter-ticket-raffle}",
-
     "cannot-create-raffle-without-keyword": "Sorry, $sender, but you cannot create raffle without keyword",
     "raffle-is-already-running": "Sorry, $sender, raffle is already running with keyword $keyword",
     "no-raffle-is-currently-running": "$sender, no raffles without winners are currently running",
-
     "no-participants-to-pick-winner": "$sender, nobody joined a raffle",
     "raffle-winner-is": "Winner of raffle $keyword is $username! Win probability was $probability%!"
   },
   "bets": {
-      "running": "$sender, bet is already opened! Bet options: $options. Use $command close 1-$maxIndex",
-      "notRunning": "No bet is currently opened, ask mods to open it!",
-      "opened": "New bet '$title' is opened! Bet options: $options. Use $command 1-$maxIndex <amount> to win! You have only $minutesmin to bet!",
-      "closeNotEnoughOptions": "$sender, you need to select winning option for bet close.",
-      "notEnoughOptions": "$sender, new bets needs at least 2 options!",
-      "info": "Bet '$title' is still opened! Bet options: $options. Use $command 1-$maxIndex <amount> to win! You have only $minutesmin to bet!",
-      "diffBet": "$sender, you already made a bet on $option and you cannot bet to different option!",
-      "undefinedBet": "Sorry, $sender, but this bet option doesn't exist, use $command to check usage",
-      "betPercentGain": "Bet percent gain per option was set to $value%",
-      "betCloseTimer": "Bets will be automatically closed after $valuemin",
-      "refund": "Bets were closed without a winning. All users are refunded!",
-      "notOption": "$sender, this option doesn't exist! Bet is not closed, check $command",
-      "closed": "Bets was closed and winning option was $option! $amount users won in total $points $pointsName!",
-      "timeUpBet": "I guess you are too late, $sender, your time for betting is up!",
-      "locked": "Betting time is up! No more bets.",
-      "zeroBet": "Oh boy, $sender, you cannot bet 0 $pointsName",
-      "lockedInfo": "Bet '$title' is still opened, but time for betting is up!",
-      "removed": "Betting time is up! No bets were sent -> automatically closing",
-      "error": "Sorry, $sender, this command is not correct! Use $command 1-$maxIndex <amount>. E.g. $command 0 100 will bet 100 points to item 0."
+    "running": "$sender, bet is already opened! Bet options: $options. Use $command close 1-$maxIndex",
+    "notRunning": "No bet is currently opened, ask mods to open it!",
+    "opened": "New bet '$title' is opened! Bet options: $options. Use $command 1-$maxIndex <amount> to win! You have only $minutesmin to bet!",
+    "closeNotEnoughOptions": "$sender, you need to select winning option for bet close.",
+    "notEnoughOptions": "$sender, new bets needs at least 2 options!",
+    "info": "Bet '$title' is still opened! Bet options: $options. Use $command 1-$maxIndex <amount> to win! You have only $minutesmin to bet!",
+    "diffBet": "$sender, you already made a bet on $option and you cannot bet to different option!",
+    "undefinedBet": "Sorry, $sender, but this bet option doesn't exist, use $command to check usage",
+    "betPercentGain": "Bet percent gain per option was set to $value%",
+    "betCloseTimer": "Bets will be automatically closed after $valuemin",
+    "refund": "Bets were closed without a winning. All users are refunded!",
+    "notOption": "$sender, this option doesn't exist! Bet is not closed, check $command",
+    "closed": "Bets was closed and winning option was $option! $amount users won in total $points $pointsName!",
+    "timeUpBet": "I guess you are too late, $sender, your time for betting is up!",
+    "locked": "Betting time is up! No more bets.",
+    "zeroBet": "Oh boy, $sender, you cannot bet 0 $pointsName",
+    "lockedInfo": "Bet '$title' is still opened, but time for betting is up!",
+    "removed": "Betting time is up! No bets were sent -> automatically closing",
+    "error": "Sorry, $sender, this command is not correct! Use $command 1-$maxIndex <amount>. E.g. $command 0 100 will bet 100 points to item 0."
   },
   "alias": {
     "alias-parse-failed": "{core.command-parse} !alias",
@@ -884,7 +882,6 @@
     "alias-group-list-aliases": "$sender, list of aliases in $group: $list",
     "alias-group-list-enabled": "$sender, aliases in $group are enabled.",
     "alias-group-list-disabled": "$sender, aliases in $group are disabled."
-
   },
   "customcmds": {
     "commands-parse-failed": "{core.command-parse} $command",
@@ -917,7 +914,6 @@
     "keyword-was-removed": "$sender, keyword $keyword was removed",
     "list-of-responses-is-empty": "$sender, $keyword have no responses or doesn't exists",
     "response": "$keyword#$index ($permission) $after| $response"
-
   },
   "points": {
     "success": {
@@ -987,7 +983,7 @@
     "price-was-not-found": "$sender, price for $command was not found",
     "price-was-enabled": "$sender, price for $command was enabled",
     "price-was-disabled": "$sender, price for $command was disabled",
-    "user-have-not-enough-points": "Sorry, $sender, but you don't have $amount $pointsName to use $command",
+    "user-have-not-enough-points": "Sorry, $sender, but you don't have $amount $pointsName to use $command. Alternatively you can use $priceBits Bits.",
     "list-is-empty": "$sender, list of prices is empty",
     "list-is-not-empty": "$sender, list of prices: $list"
   },
@@ -1206,7 +1202,7 @@
     },
     "offline": "$sender, cannot save highlight, stream is offline"
   },
-  "whisper" : {
+  "whisper": {
     "settings": {
       "disablePermissionWhispers": {
         "true": "Bot won't send permissions insufficient errors",
@@ -1238,5 +1234,10 @@
   },
   "filters": {
     "setVariable": "$sender, $variable was set to $value."
+  },
+  "color": {
+    "failed": {
+      "set": "{core.command-parse} $command [color]"
+    }
   }
 }

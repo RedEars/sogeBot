@@ -5,7 +5,7 @@ import { dateDiff } from '../commons';
 import currency from '../currency';
 import { User } from '../database/entity/user';
 import {
-  command, default_permission, settings, ui,
+  command, default_permission, settings, ui, 
 } from '../decorators';
 import Expects from '../expects';
 import general from '../general';
@@ -44,7 +44,18 @@ class UserInfo extends System {
     toggleOnIcon:  'eye',
     toggleOffIcon: 'eye-slash',
   })
-  order: string[] = ['$sender', '$level', '$rank', '$role', '$watched', '$points', '$messages', '$tips', '$bits'];
+  order: string[] = [
+    '$sender',
+    '$level',
+    '$rank',
+    '$role',
+    '$watched',
+    '$points',
+    '$messages',
+    '$tips',
+    '$bits',
+    '$feeds',
+  ];
 
   @settings('me')
   _formatDisabled: string[] = ['$role'];
@@ -57,14 +68,30 @@ class UserInfo extends System {
 
   @command('!followage')
   protected async followage(opts: CommandOptions): Promise<CommandResponse[]> {
-    const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
+    const [username] = new Expects(opts.parameters)
+      .username({ optional: true, default: opts.sender.username })
+      .toArray();
     const id = await users.getIdByName(username);
-    const isFollowerUpdate = await api.isFollowerUpdate(await getRepository(User).findOne({ userId: id }));
+    const isFollowerUpdate = await api.isFollowerUpdate(
+      await getRepository(User).findOne({ userId: id }),
+    );
     debug('userinfo.followage', JSON.stringify(isFollowerUpdate));
 
     const user = await getRepository(User).findOne({ username });
     if (!user || !user.isFollower || user.followedAt === 0) {
-      return [{ response: prepare('followage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.never', { username }), ...opts }];
+      return [
+        {
+          response: prepare(
+            'followage.'
+              + (opts.sender.username === username.toLowerCase()
+                ? 'successSameUsername'
+                : 'success')
+              + '.never',
+            { username },
+          ),
+          ...opts,
+        },
+      ];
     } else {
       const units = ['years', 'months', 'days', 'hours', 'minutes'] as const;
       const diff = dateDiff(new Date(user.followedAt).getTime(), Date.now());
@@ -80,32 +107,58 @@ class UserInfo extends System {
         output.push(0 + ' ' + getLocalizedName(0, translate('core.minutes')));
       }
 
-      return [{
-        response: prepare('followage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.time', {
-          username,
-          diff: output.join(', '),
-        }), ...opts,
-      }];
+      return [
+        {
+          response: prepare(
+            'followage.'
+              + (opts.sender.username === username.toLowerCase()
+                ? 'successSameUsername'
+                : 'success')
+              + '.time',
+            {
+              username,
+              diff: output.join(', '),
+            },
+          ),
+          ...opts,
+        },
+      ];
     }
   }
 
   @command('!subage')
   protected async subage(opts: CommandOptions): Promise<CommandResponse[]> {
-    const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
+    const [username] = new Expects(opts.parameters)
+      .username({ optional: true, default: opts.sender.username })
+      .toArray();
 
     const user = await getRepository(User).findOne({ username });
     const subCumulativeMonths = user?.subscribeCumulativeMonths;
     const subStreak = user?.subscribeStreak;
-    const localePath = 'subage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.';
+    const localePath
+      = 'subage.'
+      + (opts.sender.username === username.toLowerCase()
+        ? 'successSameUsername'
+        : 'success')
+      + '.';
 
     if (!user || !user.isSubscriber || user.subscribedAt === 0) {
-      return [{
-        response: prepare(localePath + (subCumulativeMonths ? 'notNow' : 'never'), {
-          username,
-          subCumulativeMonths,
-          subCumulativeMonthsName: getLocalizedName(subCumulativeMonths || 0, translate('core.months')),
-        }), ...opts,
-      }];
+      return [
+        {
+          response: prepare(
+            localePath + (subCumulativeMonths ? 'notNow' : 'never'),
+            {
+              username,
+              subCumulativeMonths,
+              subCumulativeMonthsName: getLocalizedName(
+                subCumulativeMonths || 0,
+                translate('core.months'),
+              ),
+            },
+          ),
+          ...opts,
+        },
+      ];
     } else {
       const units = ['years', 'months', 'days', 'hours', 'minutes'] as const;
       const diff = dateDiff(new Date(user.subscribedAt).getTime(), Date.now());
@@ -120,22 +173,39 @@ class UserInfo extends System {
         output.push(0 + ' ' + getLocalizedName(0, translate('core.minutes')));
       }
 
-      return [{
-        response: prepare(localePath + (subStreak ? 'timeWithSubStreak' : 'time'), {
-          username,
-          subCumulativeMonths,
-          subCumulativeMonthsName: getLocalizedName(subCumulativeMonths || 0, translate('core.months')),
-          subStreak,
-          subStreakMonthsName:     getLocalizedName(subStreak || 0, translate('core.months')),
-          diff:                    output.join(', '),
-        }), ...opts,
-      }];
+      return [
+        {
+          response: prepare(
+            localePath + (subStreak ? 'timeWithSubStreak' : 'time'),
+            {
+              username,
+              subCumulativeMonths,
+              subCumulativeMonthsName: getLocalizedName(
+                subCumulativeMonths || 0,
+                translate('core.months'),
+              ),
+              subStreak,
+              subStreakMonthsName: getLocalizedName(
+                subStreak || 0,
+                translate('core.months'),
+              ),
+              diff: output.join(', '),
+            },
+          ),
+          ...opts,
+        },
+      ];
     }
   }
 
   @command('!age')
-  protected async age(opts: CommandOptions, retry = false): Promise<CommandResponse[]> {
-    const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
+  protected async age(
+    opts: CommandOptions,
+    retry = false,
+  ): Promise<CommandResponse[]> {
+    const [username] = new Expects(opts.parameters)
+      .username({ optional: true, default: opts.sender.username })
+      .toArray();
 
     const user = await getRepository(User).findOne({ username });
     if (!user || user.createdAt === 0) {
@@ -172,12 +242,21 @@ class UserInfo extends System {
       if (output.length === 0) {
         output.push(0 + ' ' + getLocalizedName(0, translate('core.minutes')));
       }
-      return [{
-        response: prepare('age.success.' + (opts.sender.username === username.toLowerCase() ? 'withoutUsername' : 'withUsername'), {
-          username,
-          diff: output.join(', '),
-        }), ...opts,
-      }];
+      return [
+        {
+          response: prepare(
+            'age.success.'
+              + (opts.sender.username === username.toLowerCase()
+                ? 'withoutUsername'
+                : 'withUsername'),
+            {
+              username,
+              diff: output.join(', '),
+            },
+          ),
+          ...opts,
+        },
+      ];
     }
   }
 
@@ -187,13 +266,29 @@ class UserInfo extends System {
       const [username] = new Expects(opts.parameters).username().toArray();
       const user = await getRepository(User).findOne({ username: username });
       if (!user || user.seenAt === 0) {
-        return [{ response: translate('lastseen.success.never').replace(/\$username/g, username), ...opts }];
+        return [
+          {
+            response: translate('lastseen.success.never').replace(
+              /\$username/g,
+              username,
+            ),
+            ...opts,
+          },
+        ];
       } else {
-        return [{
-          response: translate('lastseen.success.time')
-            .replace(/\$username/g, username)
-            .replace(/\$when/g, dayjs(user.seenAt).tz(timezone).format(this.lastSeenFormat)), ...opts,
-        }];
+        return [
+          {
+            response: translate('lastseen.success.time')
+              .replace(/\$username/g, username)
+              .replace(
+                /\$when/g,
+                dayjs(user.seenAt)
+                  .tz(timezone)
+                  .format(this.lastSeenFormat),
+              ),
+            ...opts,
+          },
+        ];
       }
     } catch (e) {
       return [{ response: translate('lastseen.failed.parse'), ...opts }];
@@ -203,7 +298,9 @@ class UserInfo extends System {
   @command('!watched')
   protected async watched(opts: CommandOptions): Promise<CommandResponse[]> {
     try {
-      const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
+      const [username] = new Expects(opts.parameters)
+        .username({ optional: true, default: opts.sender.username })
+        .toArray();
 
       let id;
       if (opts.sender.username === username) {
@@ -211,15 +308,30 @@ class UserInfo extends System {
       } else {
         id = await users.getIdByName(username);
       }
-      const time = id ? Number((await users.getWatchedOf(Number(id)) / (60 * 60 * 1000))).toFixed(1) : 0;
-      return [{ response: prepare('watched.success.time', { time: String(time), username }), ...opts }];
+      const time = id
+        ? Number(
+          (await users.getWatchedOf(Number(id))) / (60 * 60 * 1000),
+        ).toFixed(1)
+        : 0;
+      return [
+        {
+          response: prepare('watched.success.time', {
+            time: String(time),
+            username,
+          }),
+          ...opts,
+        },
+      ];
     } catch (e) {
       return [{ response: translate('watched.failed.parse'), ...opts }];
     }
   }
 
   @command('!me')
-  async showMe(opts: CommandOptions, returnOnly = false): Promise<string | CommandResponse[]> {
+  async showMe(
+    opts: CommandOptions,
+    returnOnly = false,
+  ): Promise<string | CommandResponse[]> {
     try {
       const message: (string | null)[] = [];
       const user = await getRepository(User).findOne({
@@ -228,7 +340,9 @@ class UserInfo extends System {
       });
 
       if (!user) {
-        throw Error(`User ${opts.sender.username}#${opts.sender.userId} not found.`);
+        throw Error(
+          `User ${opts.sender.username}#${opts.sender.userId} not found.`,
+        );
       }
 
       // build message
@@ -240,9 +354,12 @@ class UserInfo extends System {
 
       if (message.includes('$rank')) {
         const idx = message.indexOf('$rank');
-        const rank = await ranks.get(await getRepository(User).findOne({ userId: Number(opts.sender.userId) }));
+        const rank = await ranks.get(
+          await getRepository(User).findOne({ userId: Number(opts.sender.userId) }),
+        );
         if (ranks.enabled && rank.current !== null) {
-          message[idx] = typeof rank.current === 'string' ? rank.current : rank.current.rank;
+          message[idx]
+            = typeof rank.current === 'string' ? rank.current : rank.current.rank;
         } else {
           message.splice(idx, 1);
         }
@@ -251,7 +368,9 @@ class UserInfo extends System {
       if (message.includes('$level')) {
         const idx = message.indexOf('$level');
         if (levels.enabled) {
-          const level = await levels.getLevelOf(await getRepository(User).findOne({ userId: Number(opts.sender.userId) }));
+          const level = await levels.getLevelOf(
+            await getRepository(User).findOne({ userId: Number(opts.sender.userId) }),
+          );
           message[idx] = `Level ${level}`;
         } else {
           message.splice(idx, 1);
@@ -274,7 +393,10 @@ class UserInfo extends System {
 
       if (message.includes('$messages')) {
         const idx = message.indexOf('$messages');
-        message[idx] = user.messages + ' ' + getLocalizedName(user.messages, translate('core.messages'));
+        message[idx]
+          = user.messages
+          + ' '
+          + getLocalizedName(user.messages, translate('core.messages'));
       }
 
       if (message.includes('$tips')) {
@@ -282,22 +404,45 @@ class UserInfo extends System {
         const tips = user.tips;
         let tipAmount = 0;
         for (const t of tips) {
-          tipAmount += currency.exchange(Number(t.amount), t.currency, mainCurrency.value);
+          tipAmount += currency.exchange(
+            Number(t.amount),
+            t.currency,
+            mainCurrency.value,
+          );
         }
-        message[idx] = Intl.NumberFormat(general.lang, { style: 'currency', currency: mainCurrency.value }).format(tipAmount);
+        message[idx] = Intl.NumberFormat(general.lang, {
+          style:    'currency',
+          currency: mainCurrency.value,
+        }).format(tipAmount);
       }
 
       if (message.includes('$bits')) {
         const idx = message.indexOf('$bits');
         const bits = user.bits;
-        const bitAmount = bits.map(o => Number(o.amount)).reduce((a, b) => a + b, 0);
-        message[idx] = `${bitAmount} ${getLocalizedName(bitAmount, translate('core.bits'))}`;
+        const bitAmount = bits
+          .map(o => Number(o.amount))
+          .reduce((a, b) => a + b, 0);
+        message[idx] = `${bitAmount} ${getLocalizedName(
+          bitAmount,
+          translate('core.bits'),
+        )}`;
+      }
+
+      if (message.includes('$feeds')) {
+        const idx = message.indexOf('$feeds');
+        const feeds = user.feeds;
+        const feedAmount = feeds
+          .map(o => Number(o.amount))
+          .reduce((a, b) => a + b, 0);
+        message[idx] = `${feedAmount}g feeded`;
       }
 
       if (message.includes('$role')) {
         const idx = message.indexOf('$role');
         message[idx] = null;
-        const permId = await getUserHighestPermission(Number(opts.sender.userId));
+        const permId = await getUserHighestPermission(
+          Number(opts.sender.userId),
+        );
         if (permId) {
           const pItem = await get(permId);
           if (pItem) {
@@ -306,13 +451,19 @@ class UserInfo extends System {
         }
       }
 
-      const response = message.filter(o => o !== null).join(this.formatSeparator);
+      const response = message
+        .filter(o => o !== null)
+        .join(this.formatSeparator);
       if (returnOnly) {
         return response;
       } else {
-        return [{
-          response, sender: opts.sender, attr: opts.attr,
-        }];
+        return [
+          {
+            response,
+            sender: opts.sender,
+            attr:   opts.attr,
+          },
+        ];
       }
     } catch (e) {
       error(e.stack);
@@ -324,24 +475,32 @@ class UserInfo extends System {
   @default_permission(null)
   async showStats(opts: CommandOptions): Promise<CommandResponse[]> {
     try {
-      const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
+      const username = new Expects(opts.parameters)
+        .username()
+        .toArray()[0]
+        .toLowerCase();
       const user = await getRepository(User).findOne({ where: { username: username.toLowerCase() } });
 
       if (!user) {
         throw Error(`User ${username} not found.`);
       }
 
-      const response = await this.showMe({
-        ...opts,
-        sender: {
-          ...opts.sender,
-          username,
-          userId: String(user.userId),
+      const response = (await this.showMe(
+        {
+          ...opts,
+          sender: {
+            ...opts.sender,
+            username,
+            userId: String(user.userId),
+          },
         },
-      }, true) as string;
+        true,
+      )) as string;
       return [
         {
-          response: response.replace('$sender', '$touser'), sender: opts.sender, attr: { ...opts.attr, param: username },
+          response: response.replace('$sender', '$touser'),
+          sender:   opts.sender,
+          attr:     { ...opts.attr, param: username },
         },
       ];
     } catch (e) {
@@ -352,7 +511,6 @@ class UserInfo extends System {
         return [];
       }
     }
-
   }
 }
 
