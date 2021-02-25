@@ -1,5 +1,5 @@
 <template>
-  <div class="px-3 py-2">
+  <div class="px-3 py-2 pt-4">
     <b-form>
       <b-form-group :key="'name' + editationItem.id">
         <label-inside>{{ translate('integrations.obswebsocket.name.name') }}</label-inside>

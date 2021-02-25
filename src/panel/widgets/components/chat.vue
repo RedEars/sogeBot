@@ -1,12 +1,11 @@
 <template lang="pug">
-  div.widget
+  div.widget.p-1
     b-card(no-body).border-0.h-100
-      b-tabs(pills card style="overflow:hidden").h-100
-        template(v-slot:tabs-start)
-          template(v-if="!popout")
-            li(v-if="typeof nodrag === 'undefined'").nav-item.px-2.grip.text-secondary.align-self-center
+      div(style="overflow: hidden;").h-100
+          div(v-if="!popout").card-header
+            div(v-if="typeof nodrag === 'undefined'").grip.text-secondary
               fa(icon="grip-vertical" fixed-width)
-            li.nav-item
+            div
               b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-chat')" variant="outline-primary" toggle-class="border-0")
                 b-dropdown-item(target="_blank" href="/popout/#chat")
                   | {{ translate('popout') }}
@@ -14,13 +13,14 @@
                 b-dropdown-item
                   a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'chat'))" class="text-danger"
                     v-html="translate('remove-widget').replace('$name', translate('widget-title-chat'))")
-          template(v-else)
+            div.pr-3
+              a(href="#" @click="refresh").text-secondary
+                fa(icon="sync-alt" v-if="!isRefreshing" fixed-width)
+                fa(icon="sync-alt" spin v-else fixed-width)
+          div(v-else)
             b-button(variant="outline-primary" :disabled="true").border-0 {{ translate('widget-title-chat') }}
-
-        b-tab(active)
-          template(v-slot:title)
             fa(icon='comment-alt' fixed-width)
-          b-card-text.h-100
+          b-card-text(style="height:95%")
             div.h-100
               b-alert(variant="danger" v-if="!isHttps" show)
                 | You need to run bot on HTTPS on port 443 with valid certificate for this embed to be working
@@ -32,24 +32,17 @@
                 width="100%"
                 style="height: calc(100% - 40px)"
               )
-            div(style='margin-top: -40px;')
+            div(style='margin-top: -35px;')
               div.form-row
                 b-col
                   input(type="text" v-model="chatMessage" :placeholder="translate('send-message-as-a-bot')").form-control
                 b-col
                   button(@click="sendChatMessage()").form-control.btn.btn-primary {{ translate('chat-as-bot') }}
-
-        b-tab
           template(v-slot:title)
             fa(icon="users" fixed-width)
           b-card-text
             ul(style="list-style-type: none; -webkit-column-count: 3; -moz-column-count: 3; column-count: 3; margin: 0;")
               li(v-for="chatter of chatters" :key="chatter") {{chatter}}
-
-        template(v-slot:tabs-end)
-          b-nav-item(href="#" @click="refresh")
-            fa(icon="sync-alt" v-if="!isRefreshing" fixed-width)
-            fa(icon="sync-alt" spin v-else fixed-width)
 </template>
 
 <script>
@@ -76,12 +69,6 @@ export default {
       show:         true,
     };
   },
-
-  beforeDestroy: function() {
-    for(const interval of this.interval) {
-      clearInterval(interval);
-    }
-  },
   computed: {
     isHttps() {
       const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
@@ -97,6 +84,29 @@ export default {
         + (this.theme === 'dark' ? '?darkpopout' : '')
         + (this.theme === 'dark' ? '&parent=' + window.location.hostname : '?parent=' + window.location.hostname);
     },
+  },
+
+  beforeDestroy: function() {
+    for(const interval of this.interval) {
+      clearInterval(interval);
+    }
+  },
+  created: function () {
+    this.interval.push(setInterval(() => {
+      this._chatters();
+    }, 60000));
+
+    this.socket.emit('room', (err, room) => {
+      if (err) {
+        return console.error(err);
+      }
+      this.room = room;
+      this._chatters();
+    });
+
+    this.interval.push(setInterval(() => {
+      this.theme = (localStorage.getItem('theme') || get(this.$store.state, 'configuration.core.ui.theme', 'light'));
+    }, 100));
   },
   methods: {
     refresh: function (event) {
@@ -124,23 +134,6 @@ export default {
         });
       }
     },
-  },
-  created: function () {
-    this.interval.push(setInterval(() => {
-      this._chatters();
-    }, 60000));
-
-    this.socket.emit('room', (err, room) => {
-      if (err) {
-        return console.error(err);
-      }
-      this.room = room;
-      this._chatters();
-    });
-
-    this.interval.push(setInterval(() => {
-      this.theme = (localStorage.getItem('theme') || get(this.$store.state, 'configuration.core.ui.theme', 'light'));
-    }, 100));
   },
 };
 </script>

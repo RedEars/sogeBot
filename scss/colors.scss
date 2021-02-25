@@ -1,29 +1,70 @@
-hr { border-color: $hr !important }
+hr {
+  border-color: $hr !important;
+}
 
-.navbar-brand span { color: theme-color("primary") !important }
+.navbar-brand span {
+  color: theme-color("primary") !important;
+}
 
-.stream-info h2, .stream-info h2 i { color: theme-color("primary") !important }
+.stream-info h2,
+.stream-info h2 i {
+  color: theme-color("primary");
+}
 
-.icon-follow { color: map-get($eventlist, follow) !important; }
-.icon-host { color: map-get($eventlist, host) !important; }
-.icon-raid { color: map-get($eventlist, raid) !important; }
-.icon-sub { color: map-get($eventlist, sub) !important; }
-.icon-subgift { color: map-get($eventlist, subgift) !important; }
-.icon-subcommunitygift { color: map-get($eventlist, subcommunitygift) !important; }
-.icon-resub { color: map-get($eventlist, resub) !important; }
-.icon-cheer { color: map-get($eventlist, cheer) !important; }
-.icon-tip { color: map-get($eventlist, tip) !important; }
+.icon-follow {
+  color: map-get($eventlist, follow) !important;
+}
+.icon-host {
+  color: map-get($eventlist, host) !important;
+}
+.icon-raid {
+  color: map-get($eventlist, raid) !important;
+}
+.icon-sub {
+  color: map-get($eventlist, sub) !important;
+}
+.icon-subgift {
+  color: map-get($eventlist, subgift) !important;
+}
+.icon-subcommunitygift {
+  color: map-get($eventlist, subcommunitygift) !important;
+}
+.icon-resub {
+  color: map-get($eventlist, resub) !important;
+}
+.icon-cheer {
+  color: map-get($eventlist, cheer) !important;
+}
+.icon-tip {
+  color: map-get($eventlist, tip) !important;
+}
 
-.page-menu .alert-danger, td .alert-danger { border-color: $status-not-connected-border; color: $status-not-connected !important; background-color: $status-not-connected-bg !important; }
-.page-menu .alert-warning, td .alert-warning { border-color: $status-connecting-border; color: $status-connecting !important; background-color: $status-connecting-bg !important; }
-.page-menu .alert-success, td .alert-success { border-color: $status-connected-border; color: $status-connected !important; background-color: $status-connected-bg !important; }
+.page-menu .alert-danger,
+td .alert-danger {
+  border-color: $status-not-connected-border;
+  color: $status-not-connected !important;
+  background-color: $status-not-connected-bg !important;
+}
+.page-menu .alert-warning,
+td .alert-warning {
+  border-color: $status-connecting-border;
+  color: $status-connecting !important;
+  background-color: $status-connecting-bg !important;
+}
+.page-menu .alert-success,
+td .alert-success {
+  border-color: $status-connected-border;
+  color: $status-connected !important;
+  background-color: $status-connected-bg !important;
+}
 
 .settings {
   border: 1px solid $gray-300 !important;
   background-color: $card-bg !important;
 }
 
-.nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link {
+.nav-tabs .nav-link.active,
+.nav-tabs .nav-item.show .nav-link {
   background-color: $card-bg !important;
 }
 
@@ -33,7 +74,7 @@ hr { border-color: $hr !important }
 }
 
 .focus-border {
-  border-color: $orange !important;
+  border-color: theme-color("primary") !important;
 }
 
 .bg-white {
@@ -46,4 +87,8 @@ hr { border-color: $hr !important }
 
 .input-bg {
   background-color: $white;
+}
+
+.bg-light {
+  background: #eaeaea;
 }

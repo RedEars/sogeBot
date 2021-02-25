@@ -1,8 +1,18 @@
 <template>
-  <perfect-scrollbar class="main-menu" :options="{useBothWheelAxes: true, suppressScrollY: true}">
-    <nav id="menu-detach" class="nav d-flex justify-content-between" style="width: max-content">
-      <b-nav-item :key="item.name" v-for="item of menu" :href="'#/' + item.id.replace(/\./g, '/')">
-        {{translate('menu.' + item.name)}}
+  <perfect-scrollbar
+    class="main-menu"
+    :options="{useBothWheelAxes: true, suppressScrollY: true}"
+  >
+    <nav
+      id="menu-detach"
+      class="nav container-fluid"
+    >
+      <b-nav-item
+        v-for="item of menu"
+        :key="item.name"
+        :href="'#/' + item.id.replace(/\./g, '/')"
+      >
+        {{ translate('menu.' + item.name) }}
       </b-nav-item>
     </nav>
   </perfect-scrollbar>

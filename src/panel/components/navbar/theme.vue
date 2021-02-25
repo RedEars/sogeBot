@@ -1,8 +1,32 @@
 <template>
+  <!--
   <b-btn @click="toggleTheme" class="border-0 ml-1 p-1 pl-2 pr-2" variant="null">
     <fa icon="sun" fixed-width style="color: rgb(253, 177, 0)" v-if="theme === 'light'"/>
     <fa icon="moon" fixed-width style="color: #d0d5d2" v-else/>
   </b-btn>
+  -->
+  <label style="padding-top:4px">
+    <input
+      class="toggle-checkbox"
+      type="checkbox"
+      @change="toggleTheme()"
+    >
+    <div class="toggle-slot">
+      <div class="sun-icon-wrapper">
+        <span class="sun-icon"><fa
+          icon="sun"
+          fixed-width
+        /></span>
+      </div>
+      <div class="toggle-button" />
+      <div class="moon-icon-wrapper">
+        <span class="moon-icon"><fa
+          icon="moon"
+          fixed-width
+        /></span>
+      </div>
+    </div>
+  </label>
 </template>
 
 <script lang="ts">

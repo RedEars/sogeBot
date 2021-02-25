@@ -1,12 +1,10 @@
 <template lang="pug">
-  div.widget
+  div.widget.p-1
     b-card(no-body).border-0.h-100
-      b-tabs(pills card style="overflow:hidden").h-100
-        template(v-slot:tabs-start)
-          template(v-if="!popout")
-            li(v-if="typeof nodrag === 'undefined'").nav-item.px-2.grip.text-secondary.align-self-center
+          div(v-if="!popout").card-header
+            div(v-if="typeof nodrag === 'undefined'").grip.text-secondary
               fa(icon="grip-vertical" fixed-width)
-            li.nav-item
+            div
               b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-commercial')" variant="outline-primary" toggle-class="border-0")
                 b-dropdown-item(target="_blank" href="/popout/#commercial")
                   | {{ translate('popout') }}
@@ -14,19 +12,50 @@
                 b-dropdown-item
                   a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'commercial'))" class="text-danger"
                     v-html="translate('remove-widget').replace('$name', translate('widget-title-commercial'))")
-          template(v-else)
+            div.pr-3
+              fa(icon="dollar-sign" fixed-width).text-secondary
+          div(v-else)
             b-button(variant="outline-primary" :disabled="true").border-0 {{ translate('widget-title-commercial') }}
-
-        b-tab(active)
-          template(v-slot:title)
-            fa(icon="dollar-sign" fixed-width)
-          b-card-text
-            b-row(v-if="countdown === 0").px-3
-              b-col.p-0.pr-1
-                b-form-input(v-model="value" max="180" min="30" step="30" type="range")
-              b-col.p-0
-                b-button(size="sm" @click="run").btn-block Run commercial ({{ formatTime() }})
-            hr(v-else style="border-width: 2px;margin: auto; margin-top: 1em;" :style="{animation: 'shrink-commercial-animation ' + value + 's'}").border-primary.shrink-animation
+          b-card-text.pt-3
+            b-container
+              b-row(no-gutters)
+                b-col(cols="4").px-1.pt-0.pb-1
+                  button(
+                    style="overflow: hidden;"
+                    class="btn btn-outline-secondary border-0 soundboard-list-group-item btn-block"
+                    v-on:click="run" type="button"
+                  ) 00:30
+                b-col(cols="4").px-1.pt-0.pb-1
+                  button(
+                    style="overflow: hidden;"
+                    class="btn btn-outline-secondary border-0 soundboard-list-group-item btn-block"
+                    v-on:click="run" type="button"
+                  ) 01:00
+                b-col(cols="4").px-1.pt-0.pb-1
+                  button(
+                    style="overflow: hidden;"
+                    class="btn btn-outline-secondary border-0 soundboard-list-group-item btn-block"
+                    v-on:click="run" type="button"
+                  ) 01:30
+                b-col(cols="4").px-1.pt-0.pb-1
+                  button(
+                    style="overflow: hidden;"
+                    class="btn btn-outline-secondary border-0 soundboard-list-group-item btn-block"
+                    v-on:click="run" type="button"
+                  ) 02:00
+                b-col(cols="4").px-1.pt-0.pb-1
+                  button(
+                    style="overflow: hidden;"
+                    class="btn btn-outline-secondary border-0 soundboard-list-group-item btn-block"
+                    v-on:click="run" type="button"
+                  ) 02:30
+                b-col(cols="4").px-1.pt-0.pb-1
+                  button(
+                    style="overflow: hidden;"
+                    class="btn btn-outline-secondary border-0 soundboard-list-group-item btn-block"
+                    v-on:click="run" type="button"
+                  ) 03:00
+          hr(v-else style="border-width: 2px;margin: auto; margin-top: 1em;" :style="{animation: 'shrink-commercial-animation ' + value + 's'}").border-primary.shrink-animation
 </template>
 
 <script>

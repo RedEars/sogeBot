@@ -1,77 +1,150 @@
 <template>
-  <div class="widget">
-    <b-card class="border-0 h-100" no-body>
-      <b-tabs class="h-100" pills card style="overflow:hidden" fill content-class="blackbg">
-        <template v-slot:tabs-start>
+  <div class="widget p-0">
+    <b-card
+      class="border-0 h-100"
+      no-body
+    >
+      <div
+        class="h-100"
+        style="overflow:hidden"
+        fill
+        content-class="blackbg"
+      >
+        <div class="card-header">
           <template v-if="!popout">
-            <li class="nav-item px-2 grip text-secondary align-self-center shrink" v-if="!nodrag">
-              <fa icon="grip-vertical" fixed-width></fa>
-            </li>
+            <div
+              v-if="!nodrag"
+              class="px-2 grip shrink text-secondary"
+            >
+              <fa
+                icon="grip-vertical"
+                fixed-width
+              />
+            </div>
           </template>
-          <li class="nav-item shrink">
-            <b-dropdown ref="dropdown" boundary="window" no-caret :text="translate('widget-title-ytplayer') + ' - ' + currentTag" variant="outline-primary" toggle-class="border-0">
+          <div class="shrink">
+            <b-dropdown
+              ref="dropdown"
+              boundary="window"
+              :text="translate('widget-title-ytplayer') + ' - ' + currentTag"
+              variant="outline-primary"
+              toggle-class="border-0"
+            >
               <b-dropdown-form class="form">
                 <label>Playlist</label>
                 <b-select v-model="currentTag">
-                  <b-form-select-option v-for="tag of availableTags" v-bind:key="tag" :value="tag">{{tag}}</b-form-select-option>
+                  <b-form-select-option
+                    v-for="tag of availableTags"
+                    :key="tag"
+                    :value="tag"
+                  >
+                    {{ tag }}
+                  </b-form-select-option>
                 </b-select>
               </b-dropdown-form>
-              <b-dropdown-item @click="nextAndRemoveFromPlaylist">skip &amp; remove from playlist</b-dropdown-item>
+              <b-dropdown-item @click="nextAndRemoveFromPlaylist">
+                skip &amp; remove from playlist
+              </b-dropdown-item>
               <template v-if="!popout">
-                <b-dropdown-divider></b-dropdown-divider>
-                <b-dropdown-item><a class="text-danger" href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'ytplayer'))" v-html="translate('remove-widget').replace('$name', translate('widget-title-ytplayer'))"></a></b-dropdown-item>
+                <b-dropdown-divider />
+                <b-dropdown-item>
+                  <a
+                    class="text-danger"
+                    href="#"
+                    @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'ytplayer'))"
+                    v-html="translate('remove-widget').replace('$name', translate('widget-title-ytplayer'))"
+                  />
+                </b-dropdown-item>
               </template>
             </b-dropdown>
-          </li>
-        </template>
-        <b-tab title-item-class="shrink">
-          <template v-slot:title><small>{{ requests.length }} &nbsp;</small>
-            <fa icon="list"></fa>
-          </template>
-          <b-card-text>
+          </div>
+          <div class="song-queue">
+            <small>{{ requests.length }}</small>
+          </div>
+        </div>
+        <div
+          title-item-class="shrink"
+          class="song-queue-list"
+        >
+          <b-card-text class="pl-3 pr-3">
             <b-table-simple small>
-              <b-tr v-for="(request, index) of requests" :key="index">
-                <b-td style="vertical-align: middle">{{request.title}}</b-td>
-                <b-td style="vertical-align: middle">{{request.username}}</b-td>
-                <b-td style="vertical-align: middle">{{formatTime(request.length)}}</b-td>
-                <b-td style="vertical-align: middle" class="text-right">
-                  <b-button variant="outline-danger" class="border-0" @click="removeSongRequest(String(request.id))">
-                    <fa :icon="'times'" fixed-width small/>
+              <b-tr
+                v-for="(request, index) of requests"
+                :key="index"
+              >
+                <b-td style="vertical-align: middle; font-weight: bold">
+                  {{ request.title }}
+                </b-td>
+                <b-td style="vertical-align: middle">
+                  {{ request.username }}
+                </b-td>
+                <b-td style="vertical-align: middle">
+                  {{ formatTime(request.length) }}
+                </b-td>
+                <b-td
+                  style="vertical-align: middle"
+                  class="text-right"
+                >
+                  <b-button
+                    variant="outline-danger"
+                    class="border-0"
+                    @click="removeSongRequest(String(request.id))"
+                  >
+                    <fa
+                      :icon="'times'"
+                      fixed-width
+                      small
+                    />
                   </b-button>
                 </b-td>
               </b-tr>
             </b-table-simple>
           </b-card-text>
-        </b-tab>
-        <b-tab active title-link-class="p-0 text-left overflow" title-item-class="widthmincontent">
-          <template v-slot:title>
-            <b-button-group>
-              <button class="btn nav-btn btn-success" @click="play" v-if="!autoplay">
-                <fa icon="play"></fa>
-              </button>
-              <button class="btn nav-btn btn-danger" @click="pause" v-else>
-                <fa icon="pause"></fa>
-              </button>
-              <button class="btn nav-btn btn-secondary" @click="next">
-                <fa icon="forward"></fa>
-              </button>
-            </b-button-group>
-            <span class="align-self-center mx-2" style="position:relative; top: 2px;">
-              <fa icon="play" v-if="autoplay"></fa>
-              <fa icon="pause" v-else></fa></span>
-          </template>
-          <b-card-text class="vcenter">
-            <vue-plyr
-              v-if="currentSong"
-              ref="playerRef"
-              @timeupdate="videoTimeUpdated"
-              @ended="videoEnded"
-              :options="{ controls: ['volume', 'progress', 'current-time', 'restart', 'mute'], fullscreen: { enabled: false }, clickToPlay: false }">
-              <div data-plyr-provider="youtube" :data-plyr-embed-id="currentSong.videoId"></div> <!-- this is only needed for first init of player -->
-            </vue-plyr>
-          </b-card-text>
-        </b-tab>
-      </b-tabs>
+        </div>
+        <div style="height: 100%">
+          <vue-plyr
+            v-if="currentSong"
+            ref="playerRef"
+            style="height: 100%"
+            :options="{ controls: ['volume', 'progress', 'current-time', 'restart', 'mute'], fullscreen: { enabled: false }, clickToPlay: false }"
+            @timeupdate="videoTimeUpdated"
+            @ended="videoEnded"
+          >
+            <div
+              data-plyr-provider="youtube"
+              :data-plyr-embed-id="currentSong.videoId"
+            /> <!-- this is only needed for first init of player -->
+          </vue-plyr>
+        </div>
+        <div
+          title-link-class="p-0 text-left overflow"
+          title-item-class="widthmincontent"
+          class="player-controls"
+        >
+          <b-button-group>
+            <button
+              v-if="!autoplay"
+              class="btn btn-success play"
+              @click="play"
+            >
+              <fa icon="play" />
+            </button>
+            <button
+              v-else
+              class="btn nav-btn btn-danger play"
+              @click="pause"
+            >
+              <fa icon="pause" />
+            </button>
+            <button
+              class="btn"
+              @click="next"
+            >
+              <fa icon="forward" />
+            </button>
+          </b-button-group>
+        </div>
+      </div>
     </b-card>
   </div>
 </template>

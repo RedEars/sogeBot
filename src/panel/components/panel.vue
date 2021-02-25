@@ -1,18 +1,18 @@
 <template>
   <div
-    class="border-bottom row py-2 m-0"
-    :class="sidebar ? [ 'py-2', 'border-top-0', 'border-gray', 'bg-opaque' ] : ['border-top', 'mb-3']"
+    class="row py-2 m-0"
+    :class="sidebar ? [ 'py-2', 'border-top-0', 'border-gray', 'bg-opaque' ] : ['border-top-0', 'mb-3']"
   >
     <div
       v-if="!!this.$slots.left"
-      class="slot-left col-auto mr-auto d-flex"
+      class="slot-left col-auto mr-auto d-flex pl-0"
       style="height: max-content;"
     >
       <slot name="left" />
     </div>
     <div
       v-if="!!this.$slots.right || cards || table || search"
-      class="slot-right col-auto ml-auto text-right form-inline"
+      class="slot-right col-auto ml-auto text-right form-inline pr-0"
     >
       <slot name="right" />
 
@@ -57,7 +57,7 @@
         class="ml-2 d-inline-block"
       >
         <div
-          class="input-group border w-100"
+          class="input-group border w-100 search-input"
           :class="{'focus-border': isFocused }"
         >
           <div

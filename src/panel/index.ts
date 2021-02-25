@@ -349,14 +349,14 @@ const main = async () => {
           <dashboard
             class="view pt-1"
             :style="{
-              visibility: $route.path === '/' ? 'visible' : 'hidden',
+              display: $route.path === '/' ? 'block' : 'none',
               position: $route.path === '/' ? 'inherit' : 'absolute'
             }"
           />
           <router-view
             class="view pt-1"
             :style="{
-              visibility: $route.path !== '/' ? 'visible' : 'hidden',
+              display: $route.path !== '/' ? 'block' : 'none',
               position: $route.path !== '/' ? 'inherit' : 'absolute'
             }"
           />

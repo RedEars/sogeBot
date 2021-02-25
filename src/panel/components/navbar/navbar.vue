@@ -2,15 +2,16 @@
   div.navbar.navbar-light.bg-light.fixed-top
     vue-headful(:title='name.toUpperCase() + " @ " + channelName')
     header.w-100
-      b-row.flex-nowrap.justify-content-between.align-items-center
-        b-col.text-left
+      div.container-fluid
+        div.text-left
           a(href="#/" style="line-height: 36px;").blog-header-logo.text-dark
-            strong.text-uppercase {{ name }}
-              small.text-uppercase
-               | &nbsp;{{ channelName }}
-        b-col.d-flex.justify-content-end.align-items-center
-          checklist
+            img(src="/dist/sogebot_large.png")
+
+          small.text-uppercase.channel-name
+            | | &nbsp;&nbsp;&nbsp;{{ channelName }}
+        div.d-flex.justify-content-end.align-items-center
           theme
+          checklist
           user
 
           b-dropdown(variant="light" toggle-class="text-decoration-none" no-caret)
@@ -39,7 +40,7 @@ import vueHeadful from 'vue-headful';
 import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
-Vue.component('vue-headful', vueHeadful);
+Vue.component('VueHeadful', vueHeadful);
 library.add(faBars, faSignInAlt, faSignOutAlt);
 
 const socket = getSocket('/');

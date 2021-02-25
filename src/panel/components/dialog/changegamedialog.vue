@@ -173,7 +173,7 @@
       </b-button>
 
       <b-button
-        variant="danger"
+        variant="white"
         class="float-right mr-2"
         @click="show=false"
       >

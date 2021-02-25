@@ -15484,7 +15484,7 @@
       "kind": "webfonts#webfont"
     },
     {
-      "family": "PT Sans",
+      "family": "Poppins",
       "variants": [
         "regular",
         "italic",
@@ -15530,7 +15530,7 @@
       "kind": "webfonts#webfont"
     },
     {
-      "family": "PT Sans Narrow",
+      "family": "Poppins",
       "variants": [
         "regular",
         "700"

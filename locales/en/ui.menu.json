@@ -87,5 +87,7 @@
   "lastfm": "Last.fm",
   "pubg": "PLAYERUNKNOWN'S BATTLEGROUNDS",
   "levels": "Levels",
-  "obswebsocket": "OBS Websocket"
+  "obswebsocket": "OBS Websocket",
+  "feeder": "Feeder",
+  "magichue": "MagicHue Control"
 }
