@@ -55,7 +55,7 @@
     </panel>
 
     <div class="pt-3">
-      <form>
+      <form :key="'goals-edit-form-' + currentGoal.id">
         <div class="form-group col-md-12">
           <label for="name_input">{{ translate('registry.goals.input.nameGroup.title') }}</label>
           <input
@@ -311,7 +311,10 @@
                   </div>
                 </div>
 
-                <div class="card col-12 mt-2 p-0 m-0">
+                <div
+                  :key="'goals-html-' + currentGoal.id"
+                  class="card col-12 mt-2 p-0 m-0"
+                >
                   <div class="card-header">
                     {{ translate('registry.goals.display') }}
                   </div>
@@ -412,13 +415,14 @@
 
                 <font
                   v-if="currentGoal.display !== 'custom'"
-                  key="goals-font"
+                  :key="'goals-edit-fonts-' + currentGoal.id"
                   :data.sync="currentGoal.customizationFont"
                   class="col-12 mt-2 p-0 m-0"
                 />
 
                 <div
                   v-if="currentGoal.display !== 'custom'"
+                  :key="'goals-barSettings' + currentGoal.id"
                   class="card col-12 mt-2 p-0 m-0"
                 >
                   <div class="card-header">

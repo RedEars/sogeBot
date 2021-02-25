@@ -463,7 +463,6 @@
                       id="subCumulativeMonths"
                       v-model="editationItem.subscribeCumulativeMonths"
                       type="number"
-                      readonly
                     />
                   </b-input-group>
                 </template>
@@ -516,7 +515,6 @@
                       id="subgifts"
                       v-model="editationItem.giftedSubscribes"
                       type="number"
-                      readonly
                     />
                   </b-input-group>
                 </template>
@@ -569,7 +567,6 @@
                       id="subStreak"
                       v-model="editationItem.subscribeStreak"
                       type="number"
-                      readonly
                     />
                   </b-input-group>
                 </template>
