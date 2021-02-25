@@ -80,10 +80,6 @@
         v-else
         :key="type + idx"
       >
-        <span
-          class="title text-default mb-2"
-          style="font-size: 20px !important;"
-        >{{ capitalize(translate(type)) }}</span>
         <div
           v-for="(event, i) of filteredEvents.filter(o => o.name === type)"
           :key="event.id"
@@ -91,11 +87,20 @@
           :data-index="i"
           class="card mb-3"
         >
-          <div class="card-body d-inline-flex">
+          <div class="card-header">
+            <h6
+              class="title text-default mb-0"
+            >
+              {{ capitalize(translate(type)) }}
+            </h6>
+          </div>
+          <div
+            class="card-body d-inline-flex"
+            style="align-items:center"
+          >
             <div
               v-if="Object.keys(event.definitions).length > 0 || event.filter.length > 0"
-              class="p-2 bg-light border-input mr-4"
-              style="border: 1px solid; width: 40%;"
+              style="width: 50%;"
             >
               <dl>
                 <template v-if="event.filter.length > 0">
@@ -110,6 +115,12 @@
                 </template>
               </dl>
             </div>
+            <div
+              v-if="Object.keys(event.definitions).length > 0 || event.filter.length > 0"
+              class="curly-bracket"
+            >
+              }
+            </div>
             <div class="w-100">
               <div
                 v-for="(operation, idx) of event.operations"
@@ -117,21 +128,20 @@
                 :class="{ 'pt-2': idx !== 0}"
               >
                 <div
-                  class="d-inline-flex border-input mr-4 w-100"
-                  style="border: 1px dotted"
+                  class="mr-4 w-100 pb-10"
                 >
                   <div
-                    class="bg-light p-2"
+                    class="p-2"
                     style="width: fit-content;"
                   >
                     <strong
                       :key="event.id + operation.name + '4'"
-                      style="font-size: 18px;"
+                      style="font-size: 14px;"
                     >{{ capitalize(translate(operation.name)) }}</strong>
                   </div>
                   <dl
                     :key="event.id + operation.name + '5'"
-                    class="w-100 p-2"
+                    class="w-100 p-2 mb-0"
                   >
                     <template v-for="key of Object.keys(operation.definitions)">
                       <dd :key="event.id + key + '2'">
