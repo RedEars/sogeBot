@@ -365,6 +365,13 @@ export default defineComponent({
         }
       });
 
+      socket.on('setVolume', (volume: number) => {
+        console.log('set value', volume);
+        if (volume) {
+          player.value.volume = volume / 100;
+        }
+      });
+
       intervals.push(window.setInterval(() => {
         socket.emit('songs::getAllRequests', {}, (err: any, items: SongRequestInterface[]) => {
           if (!isEqual(requests.value, items)) {

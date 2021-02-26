@@ -621,6 +621,31 @@ class Songs extends System {
     ];
   }
 
+  @command('!volume')
+  @default_permission(defaultPermissions.CASTERS)
+  async setVolume(opts: CommandOptions): Promise<CommandResponse[]> {
+    if (_.isNil(!opts.parameters)) {
+      return [
+        {
+          response: prepare('songs.set-volume', { volume: await this.getVolume(item) }),
+          ...opts,
+        },
+      ];
+    }
+
+    const volume = parseInt(opts.parameters);
+    if (this.socket) {
+      this.socket.emit('setVolume', volume);
+    }
+
+    return [
+      {
+        response: prepare('songs.set-volume'),
+        ...opts,
+      },
+    ];
+  }
+
   @command('!playlist set')
   @default_permission(defaultPermissions.CASTERS)
   async playlistSet(opts: CommandOptions): Promise<CommandResponse[]> {
