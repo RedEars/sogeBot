@@ -12,20 +12,22 @@ import Game from './_interface';
 class Seppuku extends Game {
   @settings()
   timeout = 10;
+  @settings()
+  kickMods = false;
 
   @command('!seppuku')
-  async main (opts: CommandOptions) {
+  async main(opts: CommandOptions) {
     if (isBroadcaster(opts.sender)) {
-      return [{ response: translate('gambling.seppuku.broadcaster'), ... opts }];
+      return [{ response: translate('gambling.seppuku.broadcaster'), ...opts }];
     }
 
     const isMod = isModerator(opts.sender);
-    if (isMod) {
-      return [{ response: translate('gambling.seppuku.mod'), ... opts }];
+    if (!this.kickMods && isMod) {
+      return [{ response: translate('gambling.seppuku.mod'), ...opts }];
     }
 
     timeout(opts.sender.username, this.timeout, isModerator(opts.sender));
-    return [{ response: translate('gambling.seppuku.text'), ... opts }];
+    return [{ response: translate('gambling.seppuku.text'), ...opts }];
   }
 }
 

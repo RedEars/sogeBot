@@ -1,6 +1,10 @@
 {
   "settings": {
     "enabled": "Status",
+    "kickMods": {
+      "title": "Timeout mods",
+      "help": "Can mods be timeouted? If not, mods are unable to use the command"
+    },
     "timeout": {
       "title": "Timeout duration",
       "help": "Seconds"

@@ -5,6 +5,10 @@
       "title": "Timeout duration",
       "help": "Seconds"
     },
+    "kickMods": {
+      "title": "Timeout mods",
+      "help": "Can mods be timeouted? If not, mods are unable to use the command"
+    },
     "winnerWillGet": "How many points will be added on win",
     "loserWillLose": "How many points will be lost on lose"
   }

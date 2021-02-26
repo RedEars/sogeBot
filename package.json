@@ -11,6 +11,7 @@
   "author": "Michal Orlik <sogehige@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "@vitalets/google-translate-api": "5.0.0",
     "axios": "0.21.1",
     "basic-auth": "2.0.1",
     "better-sqlite3": "7.1.2",

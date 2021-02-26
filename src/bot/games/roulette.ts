@@ -15,7 +15,7 @@ import Game from './_interface';
  */
 
 class Roulette extends Game {
-  dependsOn = [ points ];
+  dependsOn = [points];
 
   @settings()
   timeout = 10;
@@ -24,26 +24,37 @@ class Roulette extends Game {
   winnerWillGet = 0;
   @settings('rewards')
   loserWillLose = 0;
+  @settings()
+  kickMods = false;
 
   @command('!roulette')
-  async main (opts: CommandOptions): Promise<(CommandResponse & { isAlive?: boolean })[]> {
+  async main(
+    opts: CommandOptions,
+  ): Promise<(CommandResponse & { isAlive?: boolean })[]> {
     opts.sender['message-type'] = 'chat'; // force responses to chat
 
     const isAlive = !!_.random(0, 1, false);
     const isMod = isModerator(opts.sender);
     const responses: (CommandResponse & { isAlive?: boolean })[] = [];
 
-    responses.push({ response: translate('gambling.roulette.trigger'), ...opts });
+    responses.push({
+      response: translate('gambling.roulette.trigger'),
+      ...opts,
+    });
     if (isBroadcaster(opts.sender)) {
       responses.push({
-        response: translate('gambling.roulette.broadcaster'), ...opts, isAlive: true, 
+        response: translate('gambling.roulette.broadcaster'),
+        ...opts,
+        isAlive:  true,
       });
       return responses;
     }
 
-    if (isMod) {
+    if (!this.kickMods && isMod) {
       responses.push({
-        response: translate('gambling.roulette.mod'), ...opts, isAlive: true, 
+        response: translate('gambling.roulette.mod'),
+        ...opts,
+        isAlive:  true,
       });
       return responses;
     }
@@ -55,12 +66,23 @@ class Roulette extends Game {
     }, 2000);
 
     if (isAlive) {
-      await getRepository(User).increment({ userId: Number(opts.sender.userId) }, 'points', Number(this.winnerWillGet));
+      await getRepository(User).increment(
+        { userId: Number(opts.sender.userId) },
+        'points',
+        Number(this.winnerWillGet),
+      );
     } else {
-      await points.decrement({ userId: Number(opts.sender.userId) }, Number(this.loserWillLose));
+      await points.decrement(
+        { userId: Number(opts.sender.userId) },
+        Number(this.loserWillLose),
+      );
     }
     responses.push({
-      response: isAlive ? translate('gambling.roulette.alive') : translate('gambling.roulette.dead'), ...opts, isAlive, 
+      response: isAlive
+        ? translate('gambling.roulette.alive')
+        : translate('gambling.roulette.dead'),
+      ...opts,
+      isAlive,
     });
     return responses;
   }

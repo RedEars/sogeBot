@@ -89,5 +89,7 @@
   "levels": "Levels",
   "obswebsocket": "OBS Websocket",
   "feeder": "Feeder",
-  "magichue": "MagicHue Control"
+  "magichue": "MagicHue Control",
+  "translate": "Google Translate",
+  "cams": "Cam control"
 }
