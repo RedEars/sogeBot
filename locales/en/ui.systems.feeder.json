@@ -1,5 +1,6 @@
 {
   "settings": {
-    "enabled": "Status"
+    "enabled": "Status",
+    "foodAmountToFeed": "Food amount per dispenser"
   }
 }

@@ -101,7 +101,7 @@
             </b-table-simple>
           </b-card-text>
         </div>
-        <div style="height: 100%">
+        <div style="height: calc(100% - 34px)">
           <vue-plyr
             v-if="currentSong"
             ref="playerRef"

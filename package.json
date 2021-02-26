@@ -12,6 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "@vitalets/google-translate-api": "5.0.0",
+    "aki-api": "git+https://github.com/RedEars/aki-api.git",
     "axios": "0.21.1",
     "basic-auth": "2.0.1",
     "better-sqlite3": "7.1.2",

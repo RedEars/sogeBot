@@ -3,10 +3,15 @@
 // bot libraries
 import * as http from 'http';
 
+import moment from 'moment';
 import { getRepository } from 'typeorm';
 
-import { User, UserFeedInterface } from '../database/entity/user';
-import { command, default_permission } from '../decorators';
+import {
+  User, UserFeed, UserFeedInterface, 
+} from '../database/entity/user';
+import {
+  command, default_permission, settings, 
+} from '../decorators';
 import { error } from '../helpers/log';
 import { ioServer } from '../helpers/panel';
 import { ParameterError } from '../helpers/parameterError';
@@ -18,6 +23,9 @@ import System from './_interface';
 class Feeder extends System {
   isLoaded: string[] = [];
 
+  @settings()
+  foodAmountToFeed = 5;
+
   @command('!feed')
   @default_permission(defaultPermissions.VIEWERS)
   async feed(opts: CommandOptions): Promise<CommandResponse[]> {
@@ -25,10 +33,8 @@ class Feeder extends System {
       await this.feedCat(100014999);
       await this.feedCat(100015000);
       const user = await users.getUserByUsername(opts.sender.username);
-      console.log('username', opts.sender.username);
-      console.log('user', user);
       const newFeed: UserFeedInterface = {
-        amount:   Number(5),
+        amount:   Number(this.foodAmountToFeed),
         feededAt: new Date(),
       };
       user.feeds.push(newFeed);
@@ -57,10 +63,22 @@ class Feeder extends System {
   async feedInfo(opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const feedData = await this.getDailyfeeds(100014999);
-      console.log('fd', feedData);
+      const lastFeedData = await getRepository(UserFeed).findOne({ order: { id: 'DESC' } });
+      const lastFeededAt = lastFeedData ? lastFeedData.feededAt : 'never';
+      const lastFeeder = lastFeedData
+        ? await users.getNameById(lastFeedData.userId)
+        : 'Bot';
+
       return [
         {
-          response: 'We got ' + feedData.totalFedToday + 'g today! YEPPERS',
+          response:
+            'We got '
+            + feedData.totalFedToday
+            + 'g today! popCat Our last feeder was '
+            + lastFeeder
+            + ' '
+            + moment(lastFeededAt).fromNow()
+            + ' peepoCat',
           ...opts,
         },
       ];
@@ -89,7 +107,7 @@ class Feeder extends System {
         + ('0' + currentDate.getDate()).slice(-2);
       const options = {
         host:    'api.petkt.com',
-        path:    `/latest/feedermini/save_dailyfeed?deviceId=${catId}&day=${day}&time=-1&amount=5`,
+        path:    `/latest/feedermini/save_dailyfeed?deviceId=${catId}&day=${day}&time=-1&amount=${this.foodAmountToFeed}`,
         headers: {
           Accept:            'application/json',
           'X-Session':       '25be7c1c56c04ab38d671de3b1d55073zi92dbyCuP6JJLuS4Eup',
@@ -170,7 +188,6 @@ class Feeder extends System {
               totalFedToday = json.result[0].realAmount;
             }
 
-            console.log('socket yes');
             ioServer?.emit('feeder:foodAmount', { amount: totalFedToday });
             if (dailyFeeds.length) {
               /*
@@ -185,7 +202,6 @@ class Feeder extends System {
           });
         })
         .on('error', err => {
-          console.log('Error: ' + err.message);
           reject(err);
         });
     });

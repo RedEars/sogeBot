@@ -13,26 +13,31 @@ import { User } from './database/entity/user';
 import { onStreamEnd } from './decorators/on';
 import events from './events';
 import {
-  calls, isStreamOnline, rawStatus, setRateLimit, stats, streamStatusChangeSince,
+  calls,
+  isStreamOnline,
+  rawStatus,
+  setRateLimit,
+  stats,
+  streamStatusChangeSince,
 } from './helpers/api';
 import { sample } from './helpers/array/sample';
 import { attributesReplace } from './helpers/attributesReplace';
 import {
-  announce, getOwner, getUserSender, prepare,
+  announce, getOwner, getUserSender, prepare, 
 } from './helpers/commons';
 import { mainCurrency } from './helpers/currency';
 import {
-  getAll, getValueOf, setValueOf,
+  getAll, getValueOf, setValueOf, 
 } from './helpers/customvariables';
 import { csEmitter } from './helpers/customvariables/emitter';
 import { isDbConnected } from './helpers/database';
 import { dayjs } from './helpers/dayjs';
 import { eventEmitter } from './helpers/events/emitter';
 import { flatten } from './helpers/flatten';
-import { generateUsername } from './helpers/generateUsername';
+// import { generateUsername } from "./helpers/generateUsername";
 import { getLocalizedName } from './helpers/getLocalized';
 import {
-  debug, error, info, warning,
+  debug, error, info, warning, 
 } from './helpers/log';
 import { channelId } from './helpers/oauth';
 import { broadcasterId } from './helpers/oauth/broadcasterId';
@@ -41,7 +46,7 @@ import { addUIError } from './helpers/panel/';
 import { parserEmitter } from './helpers/parser/';
 import { adminEndpoint } from './helpers/socket';
 import {
-  isOwner, isSubscriber, isVIP,
+  isOwner, isSubscriber, isVIP, 
 } from './helpers/user';
 import { isBot, isBotSubscriber } from './helpers/user/isBot';
 import { isBroadcaster } from './helpers/user/isBroadcaster';
@@ -71,104 +76,395 @@ class Events extends Core {
     definitions?: {
       [x: string]: any;
     };
-    fire: (operation: Events.OperationDefinitions, attributes: Events.Attributes) => Promise<void>;
+    fire: (
+      operation: Events.OperationDefinitions,
+      attributes: Events.Attributes
+    ) => Promise<void>;
   }[];
 
   constructor() {
     super();
 
     this.supportedEventsList = [
-      { id: 'user-joined-channel', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
-      { id: 'user-parted-channel', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
-      { id: 'follow', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
-      { id: 'unfollow', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
-      { id: 'subscription', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'method', 'subCumulativeMonths', 'tier' ] },
-      { id: 'subgift', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'recipient', 'recipientis.moderator', 'recipientis.subscriber', 'recipientis.vip', 'recipientis.follower', 'recipientis.broadcaster', 'recipientis.bot', 'recipientis.owner', 'tier' ] },
-      { id: 'subcommunitygift', variables: [ 'username', 'count' ] },
-      { id: 'resub', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'subStreakShareEnabled', 'subStreak', 'subStreakName', 'subCumulativeMonths', 'subCumulativeMonthsName', 'tier' ] },
-      { id: 'tip', variables: [ 'username', 'amount', 'currency', 'message', 'amountInBotCurrency', 'currencyInBot' ] },
       {
-        id:          'command-send-x-times', variables:   [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'command', 'count', 'source' ], definitions: {
-          fadeOutXCommands: 0, fadeOutInterval: 0, runEveryXCommands: 10, commandToWatch: '', runInterval: 0,
-        }, check: this.checkCommandSendXTimes,
+        id:        'user-joined-channel',
+        variables: [
+          'username',
+          'is.moderator',
+          'is.subscriber',
+          'is.vip',
+          'is.follower',
+          'is.broadcaster',
+          'is.bot',
+          'is.owner',
+        ],
+      },
+      {
+        id:        'user-parted-channel',
+        variables: [
+          'username',
+          'is.moderator',
+          'is.subscriber',
+          'is.vip',
+          'is.follower',
+          'is.broadcaster',
+          'is.bot',
+          'is.owner',
+        ],
+      },
+      {
+        id:        'follow',
+        variables: [
+          'username',
+          'is.moderator',
+          'is.subscriber',
+          'is.vip',
+          'is.follower',
+          'is.broadcaster',
+          'is.bot',
+          'is.owner',
+        ],
+      },
+      {
+        id:        'unfollow',
+        variables: [
+          'username',
+          'is.moderator',
+          'is.subscriber',
+          'is.vip',
+          'is.follower',
+          'is.broadcaster',
+          'is.bot',
+          'is.owner',
+        ],
+      },
+      {
+        id:        'subscription',
+        variables: [
+          'username',
+          'is.moderator',
+          'is.subscriber',
+          'is.vip',
+          'is.follower',
+          'is.broadcaster',
+          'is.bot',
+          'is.owner',
+          'method',
+          'subCumulativeMonths',
+          'tier',
+        ],
+      },
+      {
+        id:        'subgift',
+        variables: [
+          'username',
+          'is.moderator',
+          'is.subscriber',
+          'is.vip',
+          'is.follower',
+          'is.broadcaster',
+          'is.bot',
+          'is.owner',
+          'recipient',
+          'recipientis.moderator',
+          'recipientis.subscriber',
+          'recipientis.vip',
+          'recipientis.follower',
+          'recipientis.broadcaster',
+          'recipientis.bot',
+          'recipientis.owner',
+          'tier',
+        ],
+      },
+      { id: 'subcommunitygift', variables: ['username', 'count'] },
+      {
+        id:        'resub',
+        variables: [
+          'username',
+          'is.moderator',
+          'is.subscriber',
+          'is.vip',
+          'is.follower',
+          'is.broadcaster',
+          'is.bot',
+          'is.owner',
+          'subStreakShareEnabled',
+          'subStreak',
+          'subStreakName',
+          'subCumulativeMonths',
+          'subCumulativeMonthsName',
+          'tier',
+        ],
+      },
+      {
+        id:        'tip',
+        variables: [
+          'username',
+          'amount',
+          'currency',
+          'message',
+          'amountInBotCurrency',
+          'currencyInBot',
+        ],
+      },
+      {
+        id:        'command-send-x-times',
+        variables: [
+          'username',
+          'is.moderator',
+          'is.subscriber',
+          'is.vip',
+          'is.follower',
+          'is.broadcaster',
+          'is.bot',
+          'is.owner',
+          'command',
+          'count',
+          'source',
+        ],
+        definitions: {
+          fadeOutXCommands:  0,
+          fadeOutInterval:   0,
+          runEveryXCommands: 10,
+          commandToWatch:    '',
+          runInterval:       0,
+        },
+        check: this.checkCommandSendXTimes,
       }, // runInterval 0 or null - disabled; > 0 every x seconds
       {
-        id:          'keyword-send-x-times', variables:   [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'command', 'count', 'source' ], definitions: {
-          fadeOutXKeywords: 0, fadeOutInterval: 0, runEveryXKeywords: 10, keywordToWatch: '', runInterval: 0, resetCountEachMessage: false,
-        }, check: this.checkKeywordSendXTimes,
+        id:        'keyword-send-x-times',
+        variables: [
+          'username',
+          'is.moderator',
+          'is.subscriber',
+          'is.vip',
+          'is.follower',
+          'is.broadcaster',
+          'is.bot',
+          'is.owner',
+          'command',
+          'count',
+          'source',
+        ],
+        definitions: {
+          fadeOutXKeywords:      0,
+          fadeOutInterval:       0,
+          runEveryXKeywords:     10,
+          keywordToWatch:        '',
+          runInterval:           0,
+          resetCountEachMessage: false,
+        },
+        check: this.checkKeywordSendXTimes,
       }, // runInterval 0 or null - disabled; > 0 every x seconds
       {
-        id: 'number-of-viewers-is-at-least-x', variables: [ 'count' ], definitions: { viewersAtLeast: 100, runInterval: 0 }, check: this.checkNumberOfViewersIsAtLeast,
+        id:          'number-of-viewers-is-at-least-x',
+        variables:   ['count'],
+        definitions: { viewersAtLeast: 100, runInterval: 0 },
+        check:       this.checkNumberOfViewersIsAtLeast,
       }, // runInterval 0 or null - disabled; > 0 every x seconds
       { id: 'stream-started' },
       { id: 'stream-stopped' },
       {
-        id: 'stream-is-running-x-minutes', definitions: { runAfterXMinutes: 100 }, check: this.checkStreamIsRunningXMinutes,
+        id:          'stream-is-running-x-minutes',
+        definitions: { runAfterXMinutes: 100 },
+        check:       this.checkStreamIsRunningXMinutes,
       },
-      { id: 'cheer', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'bits', 'message' ] },
+      {
+        id:        'cheer',
+        variables: [
+          'username',
+          'is.moderator',
+          'is.subscriber',
+          'is.vip',
+          'is.follower',
+          'is.broadcaster',
+          'is.bot',
+          'is.owner',
+          'bits',
+          'message',
+        ],
+      },
       { id: 'clearchat' },
-      { id: 'action', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
-      { id: 'ban', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'reason' ] },
-      { id: 'hosting', variables: [ 'target', 'viewers' ] },
       {
-        id: 'hosted', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'viewers' ], definitions: { viewersAtLeast: 1 }, check: this.checkHosted,
+        id:        'action',
+        variables: [
+          'username',
+          'is.moderator',
+          'is.subscriber',
+          'is.vip',
+          'is.follower',
+          'is.broadcaster',
+          'is.bot',
+          'is.owner',
+        ],
       },
       {
-        id: 'raid', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'viewers' ], definitions: { viewersAtLeast: 1 }, check: this.checkRaid,
+        id:        'ban',
+        variables: [
+          'username',
+          'is.moderator',
+          'is.subscriber',
+          'is.vip',
+          'is.follower',
+          'is.broadcaster',
+          'is.bot',
+          'is.owner',
+          'reason',
+        ],
       },
-      { id: 'mod', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
-      { id: 'commercial', variables: [ 'duration' ] },
-      { id: 'timeout', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'duration' ] },
+      { id: 'hosting', variables: ['target', 'viewers'] },
       {
-        id: 'every-x-minutes-of-stream', definitions: { runEveryXMinutes: 100 }, check: this.everyXMinutesOfStream,
+        id:        'hosted',
+        variables: [
+          'username',
+          'is.moderator',
+          'is.subscriber',
+          'is.vip',
+          'is.follower',
+          'is.broadcaster',
+          'is.bot',
+          'is.owner',
+          'viewers',
+        ],
+        definitions: { viewersAtLeast: 1 },
+        check:       this.checkHosted,
       },
-      { id: 'game-changed', variables: [ 'oldGame', 'game' ] },
       {
-        id: 'reward-redeemed', definitions: { titleOfReward: '' }, variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'userInput' ], check: this.isCorrectReward,
+        id:        'raid',
+        variables: [
+          'username',
+          'is.moderator',
+          'is.subscriber',
+          'is.vip',
+          'is.follower',
+          'is.broadcaster',
+          'is.bot',
+          'is.owner',
+          'viewers',
+        ],
+        definitions: { viewersAtLeast: 1 },
+        check:       this.checkRaid,
+      },
+      {
+        id:        'mod',
+        variables: [
+          'username',
+          'is.moderator',
+          'is.subscriber',
+          'is.vip',
+          'is.follower',
+          'is.broadcaster',
+          'is.bot',
+          'is.owner',
+        ],
+      },
+      { id: 'commercial', variables: ['duration'] },
+      {
+        id:        'timeout',
+        variables: [
+          'username',
+          'is.moderator',
+          'is.subscriber',
+          'is.vip',
+          'is.follower',
+          'is.broadcaster',
+          'is.bot',
+          'is.owner',
+          'duration',
+        ],
+      },
+      {
+        id:          'every-x-minutes-of-stream',
+        definitions: { runEveryXMinutes: 100 },
+        check:       this.everyXMinutesOfStream,
+      },
+      { id: 'game-changed', variables: ['oldGame', 'game'] },
+      {
+        id:          'reward-redeemed',
+        definitions: { titleOfReward: '' },
+        variables:   [
+          'username',
+          'is.moderator',
+          'is.subscriber',
+          'is.vip',
+          'is.follower',
+          'is.broadcaster',
+          'is.bot',
+          'is.owner',
+          'userInput',
+        ],
+        check: this.isCorrectReward,
       },
     ];
 
     this.supportedOperationsList = [
       {
-        id: 'send-chat-message', definitions: { messageToSend: '' }, fire: this.fireSendChatMessage,
+        id:          'send-chat-message',
+        definitions: { messageToSend: '' },
+        fire:        this.fireSendChatMessage,
       },
       {
-        id: 'send-whisper', definitions: { messageToSend: '' }, fire: this.fireSendWhisper,
+        id:          'send-whisper',
+        definitions: { messageToSend: '' },
+        fire:        this.fireSendWhisper,
       },
       {
-        id: 'run-command', definitions: { commandToRun: '', isCommandQuiet: false }, fire: this.fireRunCommand,
+        id:          'run-command',
+        definitions: { commandToRun: '', isCommandQuiet: false },
+        fire:        this.fireRunCommand,
       },
       {
-        id: 'emote-explosion', definitions: { emotesToExplode: '' }, fire: this.fireEmoteExplosion,
+        id:          'emote-explosion',
+        definitions: { emotesToExplode: '' },
+        fire:        this.fireEmoteExplosion,
       },
       {
-        id: 'emote-firework', definitions: { emotesToFirework: '' }, fire: this.fireEmoteFirework,
+        id:          'emote-firework',
+        definitions: { emotesToFirework: '' },
+        fire:        this.fireEmoteFirework,
       },
       {
-        id: 'start-commercial', definitions: { durationOfCommercial: [30, 60, 90, 120, 150, 180] }, fire: this.fireStartCommercial,
+        id:          'start-commercial',
+        definitions: { durationOfCommercial: [30, 60, 90, 120, 150, 180] },
+        fire:        this.fireStartCommercial,
       },
       {
-        id: 'bot-will-join-channel', definitions: {}, fire: this.fireBotWillJoinChannel,
+        id:          'bot-will-join-channel',
+        definitions: {},
+        fire:        this.fireBotWillJoinChannel,
       },
       {
-        id: 'bot-will-leave-channel', definitions: {}, fire: this.fireBotWillLeaveChannel,
+        id:          'bot-will-leave-channel',
+        definitions: {},
+        fire:        this.fireBotWillLeaveChannel,
       },
       {
-        id: 'create-a-clip', definitions: { announce: false, hasDelay: true }, fire: this.fireCreateAClip,
+        id:          'create-a-clip',
+        definitions: { announce: false, hasDelay: true },
+        fire:        this.fireCreateAClip,
       },
       {
-        id: 'create-a-clip-and-play-replay', definitions: { announce: false, hasDelay: true }, fire: this.fireCreateAClipAndPlayReplay,
+        id:          'create-a-clip-and-play-replay',
+        definitions: { announce: false, hasDelay: true },
+        fire:        this.fireCreateAClipAndPlayReplay,
       },
       {
-        id: 'increment-custom-variable', definitions: { customVariable: '', numberToIncrement: '1' }, fire: this.fireIncrementCustomVariable,
+        id:          'increment-custom-variable',
+        definitions: { customVariable: '', numberToIncrement: '1' },
+        fire:        this.fireIncrementCustomVariable,
       },
       {
-        id: 'decrement-custom-variable', definitions: { customVariable: '', numberToDecrement: '1' }, fire: this.fireDecrementCustomVariable,
+        id:          'decrement-custom-variable',
+        definitions: { customVariable: '', numberToDecrement: '1' },
+        fire:        this.fireDecrementCustomVariable,
       },
     ];
 
     this.addMenu({
-      category: 'manage', name: 'event-listeners', id: 'manage/events/list', this: null,
+      category: 'manage',
+      name:     'event-listeners',
+      id:       'manage/events/list',
+      this:     null,
     });
     this.fadeOut();
 
@@ -218,11 +514,19 @@ class Events extends Core {
     excludedUsers.clear();
   }
 
-  public async fire(eventId: string, attributes: Events.Attributes): Promise<void> {
+  public async fire(
+    eventId: string,
+    attributes: Events.Attributes,
+  ): Promise<void> {
     attributes = _.cloneDeep(attributes) || {};
     debug('events', JSON.stringify({ eventId, attributes }));
 
-    if (attributes.username !== null && typeof attributes.username !== 'undefined' && (!attributes.userId && !excludedUsers.has(attributes.username))) {
+    if (
+      attributes.username !== null
+      && typeof attributes.username !== 'undefined'
+      && !attributes.userId
+      && !excludedUsers.has(attributes.username)
+    ) {
       excludedUsers.delete(attributes.username); // remove from excluded users if passed first if
 
       const user = attributes.userId
@@ -232,14 +536,22 @@ class Events extends Core {
       if (!user) {
         try {
           await getRepository(User).save({
-            userId:   Number(attributes.userId ? attributes.userId : await getIdFromTwitch(attributes.username)),
+            userId: Number(
+              attributes.userId
+                ? attributes.userId
+                : await getIdFromTwitch(attributes.username),
+            ),
             username: attributes.username,
           });
           return this.fire(eventId, attributes);
         } catch (e) {
           excludedUsers.add(attributes.username);
-          warning(`User ${attributes.username} triggered event ${eventId} was not found on Twitch.`);
-          warning(`User ${attributes.username} will be excluded from events, until stream restarts or user writes in chat and his data will be saved.`);
+          warning(
+            `User ${attributes.username} triggered event ${eventId} was not found on Twitch.`,
+          );
+          warning(
+            `User ${attributes.username} will be excluded from events, until stream restarts or user writes in chat and his data will be saved.`,
+          );
           warning(e);
           return;
         }
@@ -281,25 +593,30 @@ class Events extends Core {
       return;
     }
 
-    for (const event of (await getRepository(Event).find({
+    for (const event of await getRepository(Event).find({
       relations: ['operations'],
       where:     {
         name:      eventId,
         isEnabled: true,
       },
-    }))) {
+    })) {
       const [shouldRunByFilter, shouldRunByDefinition] = await Promise.all([
         this.checkFilter(event, _.cloneDeep(attributes)),
         this.checkDefinition(_.clone(event), _.cloneDeep(attributes)),
       ]);
-      if ((!shouldRunByFilter || !shouldRunByDefinition)) {
+      if (!shouldRunByFilter || !shouldRunByDefinition) {
         continue;
       }
 
       for (const operation of event.operations) {
-        const isOperationSupported = typeof this.supportedOperationsList.find((o) => o.id === operation.name) !== 'undefined';
+        const isOperationSupported
+          = typeof this.supportedOperationsList.find(
+            o => o.id === operation.name,
+          ) !== 'undefined';
         if (isOperationSupported) {
-          const foundOp = this.supportedOperationsList.find((o) =>  o.id === operation.name);
+          const foundOp = this.supportedOperationsList.find(
+            o => o.id === operation.name,
+          );
           if (foundOp) {
             foundOp.fire(operation.definitions, _.cloneDeep(attributes));
           }
@@ -317,21 +634,30 @@ class Events extends Core {
 
   public async fireCreateAClip(operation: Events.OperationDefinitions) {
     const cid = await api.createClip({ hasDelay: operation.hasDelay });
-    if (cid) { // OK
+    if (cid) {
+      // OK
       if (Boolean(operation.announce) === true) {
-        announce(prepare('api.clips.created', { link: `https://clips.twitch.tv/${cid}` }), 'general');
+        announce(
+          prepare('api.clips.created', { link: `https://clips.twitch.tv/${cid}` }),
+          'general',
+        );
       }
       info('Clip was created successfully');
       return cid;
-    } else { // NG
+    } else {
+      // NG
       warning('Clip was not created successfully');
       return null;
     }
   }
 
-  public async fireCreateAClipAndPlayReplay(operation: Events.OperationDefinitions, attributes: Events.Attributes) {
+  public async fireCreateAClipAndPlayReplay(
+    operation: Events.OperationDefinitions,
+    attributes: Events.Attributes,
+  ) {
     const cid = await events.fireCreateAClip(operation);
-    if (cid) { // clip created ok
+    if (cid) {
+      // clip created ok
       require('./overlays/clips').default.showClip(cid);
     }
   }
@@ -352,25 +678,37 @@ class Events extends Core {
 
     const token = await oauth.broadcasterAccessToken;
     if (!oauth.broadcasterCurrentScopes.includes('channel:edit:commercial')) {
-      warning('Missing Broadcaster oAuth scope channel:edit:commercial to start commercial');
-      addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth scope channel:edit:commercial to start commercial' });
+      warning(
+        'Missing Broadcaster oAuth scope channel:edit:commercial to start commercial',
+      );
+      addUIError({
+        name:    'OAUTH',
+        message:
+          'Missing Broadcaster oAuth scope channel:edit:commercial to start commercial',
+      });
       return;
     }
     if (token === '') {
       warning('Missing Broadcaster oAuth to change game or title');
-      addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth to change game or title' });
+      addUIError({
+        name:    'OAUTH',
+        message: 'Missing Broadcaster oAuth to change game or title',
+      });
       return;
     }
 
     try {
       const request = await axios({
-        method:  'post',
+        method: 'post',
         url,
-        data:    { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) },
+        data:   {
+          broadcaster_id: String(cid),
+          length:         Number(operation.durationOfCommercial),
+        },
         headers: {
-          'Authorization': 'Bearer ' + token,
-          'Client-ID':     oauth.broadcasterClientId,
-          'Content-Type':  'application/json',
+          Authorization:  'Bearer ' + token,
+          'Client-ID':    oauth.broadcasterClientId,
+          'Content-Type': 'application/json',
         },
       });
 
@@ -378,19 +716,56 @@ class Events extends Core {
       setRateLimit('broadcaster', request.headers);
 
       ioServer?.emit('api.stats', {
-        method: 'POST', request: { data: { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: request.status, data: request.data, remaining: calls.broadcaster,
+        method:  'POST',
+        request: {
+          data: {
+            broadcaster_id: String(cid),
+            length:         Number(operation.durationOfCommercial),
+          },
+        },
+        timestamp: Date.now(),
+        call:      'commercial',
+        api:       'helix',
+        endpoint:  url,
+        code:      request.status,
+        data:      request.data,
+        remaining: calls.broadcaster,
       });
       eventEmitter.emit('commercial', { duration: Number(operation.durationOfCommercial) });
     } catch (e) {
       if (e.isAxiosError) {
         error(`API: ${url} - ${e.response.data.message}`);
         ioServer?.emit('api.stats', {
-          method: 'POST', request: { data: { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.response?.data ?? 'n/a',
+          method:  'POST',
+          request: {
+            data: {
+              broadcaster_id: String(cid),
+              length:         Number(operation.durationOfCommercial),
+            },
+          },
+          timestamp: Date.now(),
+          call:      'commercial',
+          api:       'helix',
+          endpoint:  url,
+          code:      e.response?.status ?? 'n/a',
+          data:      e.response?.data ?? 'n/a',
         });
       } else {
         error(`API: ${url} - ${e.stack}`);
         ioServer?.emit('api.stats', {
-          method: 'POST', request: { data: { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack,
+          method:  'POST',
+          request: {
+            data: {
+              broadcaster_id: String(cid),
+              length:         Number(operation.durationOfCommercial),
+            },
+          },
+          timestamp: Date.now(),
+          call:      'commercial',
+          api:       'helix',
+          endpoint:  url,
+          code:      e.response?.status ?? 'n/a',
+          data:      e.stack,
         });
       }
     }
@@ -408,12 +783,21 @@ class Events extends Core {
     emotes.default.firework(String(operation.emotesToFirework).split(' '));
   }
 
-  public async fireRunCommand(operation: Events.OperationDefinitions, attributes: Events.Attributes) {
-    const username = _.isNil(attributes.username) ? getOwner() : attributes.username;
-    const userId = attributes.userId ? attributes.userId : await users.getIdByName(username);
+  public async fireRunCommand(
+    operation: Events.OperationDefinitions,
+    attributes: Events.Attributes,
+  ) {
+    const username = _.isNil(attributes.username)
+      ? getOwner()
+      : attributes.username;
+    const userId = attributes.userId
+      ? attributes.userId
+      : await users.getIdByName(username);
 
     let command = String(operation.commandToRun);
-    for (const key of Object.keys(attributes).sort((a, b) => a.length - b.length)) {
+    for (const key of Object.keys(attributes).sort(
+      (a, b) => a.length - b.length,
+    )) {
       const val = attributes[key];
       if (_.isObject(val) && Object.keys(val).length === 0) {
         return;
@@ -421,21 +805,34 @@ class Events extends Core {
       const replace = new RegExp(`\\$${key}`, 'g');
       command = command.replace(replace, val);
     }
-    command = await new Message(command).parse({ username, sender: getUserSender(String(userId), username) });
+    command = await new Message(command).parse({
+      username,
+      sender: getUserSender(String(userId), username),
+    });
 
     if (global.mocha) {
-      parserEmitter.emit('process', {
-        sender:  { username: oauth.broadcasterUsername, userId: broadcasterId.value },
-        message: command,
-        skip:    true,
-        quiet:   _.get(operation, 'isCommandQuiet', false) as boolean,
-      }, (responses) => {
-        for (let i = 0; i < responses.length; i++) {
-          setTimeout(async () => {
-            parserReply(await responses[i].response, { sender: responses[i].sender, attr: responses[i].attr });
-          }, 500 * i);
-        }
-      });
+      parserEmitter.emit(
+        'process',
+        {
+          sender: {
+            username: oauth.broadcasterUsername,
+            userId:   broadcasterId.value,
+          },
+          message: command,
+          skip:    true,
+          quiet:   _.get(operation, 'isCommandQuiet', false) as boolean,
+        },
+        responses => {
+          for (let i = 0; i < responses.length; i++) {
+            setTimeout(async () => {
+              parserReply(await responses[i].response, {
+                sender: responses[i].sender,
+                attr:   responses[i].attr,
+              });
+            }, 500 * i);
+          }
+        },
+      );
     } else {
       tmi.message({
         message: {
@@ -448,8 +845,14 @@ class Events extends Core {
     }
   }
 
-  public async fireSendChatMessageOrWhisper(operation: Events.OperationDefinitions, attributes: Events.Attributes, whisper: boolean): Promise<void> {
-    const username = _.isNil(attributes.username) ? getOwner() : attributes.username;
+  public async fireSendChatMessageOrWhisper(
+    operation: Events.OperationDefinitions,
+    attributes: Events.Attributes,
+    whisper: boolean,
+  ): Promise<void> {
+    const username = _.isNil(attributes.username)
+      ? getOwner()
+      : attributes.username;
     let userId = attributes.userId;
     const userObj = await getRepository(User).findOne({ username });
     if (!userObj && !attributes.test) {
@@ -457,48 +860,71 @@ class Events extends Core {
         userId: Number(await getIdFromTwitch(username)),
         username,
       });
-      return this.fireSendChatMessageOrWhisper(operation, {
-        ...attributes, userId, username,
-      }, whisper);
+      return this.fireSendChatMessageOrWhisper(
+        operation,
+        {
+          ...attributes,
+          userId,
+          username,
+        },
+        whisper,
+      );
     } else if (attributes.test) {
       userId = attributes.userId;
     } else if (!userObj) {
       return;
     }
 
-    const message = attributesReplace(attributes, String(operation.messageToSend));
-    parserReply(message, {
-      sender: {
-        badges:      {},
-        emotes:      [],
-        userId:      String(userId),
-        username,
-        displayName: userObj?.displayname || username,
-        color:       '',
-        emoteSets:   [],
-        userType:    'viewer',
-        isModerator: false,
-        mod:         '0',
-        subscriber:  '0',
-        turbo:       '0',
+    const message = attributesReplace(
+      attributes,
+      String(operation.messageToSend),
+    );
+    parserReply(
+      message,
+      {
+        sender: {
+          badges:      {},
+          emotes:      [],
+          userId:      String(userId),
+          username,
+          displayName: userObj?.displayname || username,
+          color:       '',
+          emoteSets:   [],
+          userType:    'viewer',
+          isModerator: false,
+          mod:         '0',
+          subscriber:  '0',
+          turbo:       '0',
+        },
       },
-    }, whisper ? 'whisper' : 'chat');
+      whisper ? 'whisper' : 'chat',
+    );
   }
 
-  public async fireSendWhisper(operation: Events.OperationDefinitions, attributes: Events.Attributes) {
+  public async fireSendWhisper(
+    operation: Events.OperationDefinitions,
+    attributes: Events.Attributes,
+  ) {
     events.fireSendChatMessageOrWhisper(operation, attributes, true);
   }
 
-  public async fireSendChatMessage(operation: Events.OperationDefinitions, attributes: Events.Attributes) {
+  public async fireSendChatMessage(
+    operation: Events.OperationDefinitions,
+    attributes: Events.Attributes,
+  ) {
     events.fireSendChatMessageOrWhisper(operation, attributes, false);
   }
 
-  public async fireIncrementCustomVariable(operation: Events.OperationDefinitions) {
+  public async fireIncrementCustomVariable(
+    operation: Events.OperationDefinitions,
+  ) {
     const customVariableName = operation.customVariable;
     const numberToIncrement = Number(operation.numberToIncrement);
 
     // check if value is number
-    let currentValue: string | number = await getValueOf('$_' + customVariableName);
+    let currentValue: string | number = await getValueOf(
+      '$_' + customVariableName,
+    );
     if (!_.isFinite(parseInt(currentValue, 10))) {
       currentValue = String(numberToIncrement);
     } else {
@@ -516,7 +942,9 @@ class Events extends Core {
     }
   }
 
-  public async fireDecrementCustomVariable(operation: Events.OperationDefinitions) {
+  public async fireDecrementCustomVariable(
+    operation: Events.OperationDefinitions,
+  ) {
     const customVariableName = String(operation.customVariable);
     const numberToDecrement = Number(operation.numberToDecrement);
 
@@ -540,10 +968,18 @@ class Events extends Core {
 
   public async everyXMinutesOfStream(event: EventInterface) {
     // set to Date.now() because 0 will trigger event immediatelly after stream start
-    const shouldSave = _.get(event, 'triggered.runEveryXMinutes', 0) === 0 || typeof _.get(event, 'triggered.runEveryXMinutes', 0) !== 'number';
-    event.triggered.runEveryXMinutes = _.get(event, 'triggered.runEveryXMinutes', Date.now());
+    const shouldSave
+      = _.get(event, 'triggered.runEveryXMinutes', 0) === 0
+      || typeof _.get(event, 'triggered.runEveryXMinutes', 0) !== 'number';
+    event.triggered.runEveryXMinutes = _.get(
+      event,
+      'triggered.runEveryXMinutes',
+      Date.now(),
+    );
 
-    const shouldTrigger = Date.now() - new Date(event.triggered.runEveryXMinutes).getTime() >= Number(event.definitions.runEveryXMinutes) * 60 * 1000;
+    const shouldTrigger
+      = Date.now() - new Date(event.triggered.runEveryXMinutes).getTime()
+      >= Number(event.definitions.runEveryXMinutes) * 60 * 1000;
     if (shouldTrigger || shouldSave) {
       event.triggered.runEveryXMinutes = Date.now();
       await getRepository(Event).save(event);
@@ -551,20 +987,29 @@ class Events extends Core {
     return shouldTrigger;
   }
 
-  public async isCorrectReward(event: EventInterface, attributes: Events.Attributes) {
-    const shouldTrigger = (attributes.titleOfReward === event.definitions.titleOfReward);
+  public async isCorrectReward(
+    event: EventInterface,
+    attributes: Events.Attributes,
+  ) {
+    const shouldTrigger
+      = attributes.titleOfReward === event.definitions.titleOfReward;
     return shouldTrigger;
   }
 
   public async checkRaid(event: EventInterface, attributes: Events.Attributes) {
     event.definitions.viewersAtLeast = Number(event.definitions.viewersAtLeast); // force Integer
-    const shouldTrigger = (attributes.viewers >= event.definitions.viewersAtLeast);
+    const shouldTrigger
+      = attributes.viewers >= event.definitions.viewersAtLeast;
     return shouldTrigger;
   }
 
-  public async checkHosted(event: EventInterface, attributes: Events.Attributes) {
+  public async checkHosted(
+    event: EventInterface,
+    attributes: Events.Attributes,
+  ) {
     event.definitions.viewersAtLeast = Number(event.definitions.viewersAtLeast); // force Integer
-    const shouldTrigger = (attributes.viewers >= event.definitions.viewersAtLeast);
+    const shouldTrigger
+      = attributes.viewers >= event.definitions.viewersAtLeast;
     return shouldTrigger;
   }
 
@@ -572,9 +1017,16 @@ class Events extends Core {
     if (!isStreamOnline.value) {
       return false;
     }
-    event.triggered.runAfterXMinutes = _.get(event, 'triggered.runAfterXMinutes', 0);
-    const shouldTrigger = event.triggered.runAfterXMinutes === 0
-                          && Number(dayjs.utc().unix()) - Number(dayjs.utc(streamStatusChangeSince.value).unix()) > Number(event.definitions.runAfterXMinutes) * 60;
+    event.triggered.runAfterXMinutes = _.get(
+      event,
+      'triggered.runAfterXMinutes',
+      0,
+    );
+    const shouldTrigger
+      = event.triggered.runAfterXMinutes === 0
+      && Number(dayjs.utc().unix())
+        - Number(dayjs.utc(streamStatusChangeSince.value).unix())
+        > Number(event.definitions.runAfterXMinutes) * 60;
     if (shouldTrigger) {
       event.triggered.runAfterXMinutes = event.definitions.runAfterXMinutes;
       await getRepository(Event).save(event);
@@ -590,9 +1042,13 @@ class Events extends Core {
 
     const viewers = stats.value.currentViewers;
 
-    const shouldTrigger = viewers >= event.definitions.viewersAtLeast
-                        && ((event.definitions.runInterval > 0 && Date.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000)
-                        || (event.definitions.runInterval === 0 && event.triggered.runInterval === 0));
+    const shouldTrigger
+      = viewers >= event.definitions.viewersAtLeast
+      && ((event.definitions.runInterval > 0
+        && Date.now() - event.triggered.runInterval
+          >= event.definitions.runInterval * 1000)
+        || (event.definitions.runInterval === 0
+          && event.triggered.runInterval === 0));
     if (shouldTrigger) {
       event.triggered.runInterval = Date.now();
       await getRepository(Event).save(event);
@@ -600,13 +1056,20 @@ class Events extends Core {
     return shouldTrigger;
   }
 
-  public async checkCommandSendXTimes(event: EventInterface, attributes: Events.Attributes) {
+  public async checkCommandSendXTimes(
+    event: EventInterface,
+    attributes: Events.Attributes,
+  ) {
     const regexp = new RegExp(`^${event.definitions.commandToWatch}\\s`, 'i');
 
     let shouldTrigger = false;
     attributes.message += ' ';
     if (attributes.message.match(regexp)) {
-      event.triggered.runEveryXCommands = _.get(event, 'triggered.runEveryXCommands', 0);
+      event.triggered.runEveryXCommands = _.get(
+        event,
+        'triggered.runEveryXCommands',
+        0,
+      );
       event.triggered.runInterval = _.get(event, 'triggered.runInterval', 0);
 
       event.definitions.runInterval = Number(event.definitions.runInterval); // force Integer
@@ -614,9 +1077,13 @@ class Events extends Core {
 
       event.triggered.runEveryXCommands++;
       shouldTrigger
-        = event.triggered.runEveryXCommands >= event.definitions.runEveryXCommands
-        && ((event.definitions.runInterval > 0 && Date.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000)
-        || (event.definitions.runInterval === 0 && event.triggered.runInterval === 0));
+        = event.triggered.runEveryXCommands
+          >= event.definitions.runEveryXCommands
+        && ((event.definitions.runInterval > 0
+          && Date.now() - event.triggered.runInterval
+            >= event.definitions.runInterval * 1000)
+          || (event.definitions.runInterval === 0
+            && event.triggered.runInterval === 0));
       if (shouldTrigger) {
         event.triggered.runInterval = Date.now();
         event.triggered.runEveryXCommands = 0;
@@ -626,14 +1093,21 @@ class Events extends Core {
     return shouldTrigger;
   }
 
-  public async checkKeywordSendXTimes(event: EventInterface, attributes: Events.Attributes) {
+  public async checkKeywordSendXTimes(
+    event: EventInterface,
+    attributes: Events.Attributes,
+  ) {
     const regexp = new RegExp(`${event.definitions.keywordToWatch}`, 'gi');
 
     let shouldTrigger = false;
     attributes.message += ' ';
     const match = attributes.message.match(regexp);
     if (match) {
-      event.triggered.runEveryXKeywords = _.get(event, 'triggered.runEveryXKeywords', 0);
+      event.triggered.runEveryXKeywords = _.get(
+        event,
+        'triggered.runEveryXKeywords',
+        0,
+      );
       event.triggered.runInterval = _.get(event, 'triggered.runInterval', 0);
 
       event.definitions.runInterval = Number(event.definitions.runInterval); // force Integer
@@ -644,12 +1118,17 @@ class Events extends Core {
       }
 
       // add count from match
-      event.triggered.runEveryXKeywords = Number(event.triggered.runEveryXKeywords) + Number(match.length);
+      event.triggered.runEveryXKeywords
+        = Number(event.triggered.runEveryXKeywords) + Number(match.length);
 
       shouldTrigger
-        = event.triggered.runEveryXKeywords >= event.definitions.runEveryXKeywords
-        && ((event.definitions.runInterval > 0 && Date.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000)
-        || (event.definitions.runInterval === 0 && event.triggered.runInterval === 0));
+        = event.triggered.runEveryXKeywords
+          >= event.definitions.runEveryXKeywords
+        && ((event.definitions.runInterval > 0
+          && Date.now() - event.triggered.runInterval
+            >= event.definitions.runInterval * 1000)
+          || (event.definitions.runInterval === 0
+            && event.triggered.runInterval === 0));
       if (shouldTrigger) {
         event.triggered.runInterval = Date.now();
         event.triggered.runEveryXKeywords = 0;
@@ -659,15 +1138,21 @@ class Events extends Core {
     return shouldTrigger;
   }
 
-  public async checkDefinition(event: EventInterface, attributes: Events.Attributes) {
-    const foundEvent = this.supportedEventsList.find((o) => o.id === event.name);
+  public async checkDefinition(
+    event: EventInterface,
+    attributes: Events.Attributes,
+  ) {
+    const foundEvent = this.supportedEventsList.find(o => o.id === event.name);
     if (!foundEvent || !foundEvent.check) {
       return true;
     }
     return foundEvent.check(event, attributes);
   }
 
-  public async checkFilter(event: EventInterface, attributes: Events.Attributes) {
+  public async checkFilter(
+    event: EventInterface,
+    attributes: Events.Attributes,
+  ) {
     if (event.filter.trim().length === 0) {
       return true;
     }
@@ -716,7 +1201,7 @@ class Events extends Core {
   }
 
   public sockets() {
-    adminEndpoint(this.nsp, 'events::getRedeemedRewards', async (cb) => {
+    adminEndpoint(this.nsp, 'events::getRedeemedRewards', async cb => {
       try {
         const rewards = await api.getCustomRewards();
         cb(null, rewards?.data ? [...rewards?.data.map(o => o.title)] : []);
@@ -724,9 +1209,12 @@ class Events extends Core {
         cb(e.stack, []);
       }
     });
-    adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
+    adminEndpoint(this.nsp, 'generic::getAll', async cb => {
       try {
-        cb(null, await getRepository(Event).find({ relations: ['operations'] }));
+        cb(
+          null,
+          await getRepository(Event).find({ relations: ['operations'] }),
+        );
       } catch (e) {
         cb(e.stack, []);
       }
@@ -742,14 +1230,14 @@ class Events extends Core {
         cb(e.stack, undefined);
       }
     });
-    adminEndpoint(this.nsp, 'list.supported.events', (cb) => {
+    adminEndpoint(this.nsp, 'list.supported.events', cb => {
       try {
         cb(null, this.supportedEventsList);
       } catch (e) {
         cb(e.stack, []);
       }
     });
-    adminEndpoint(this.nsp, 'list.supported.operations', (cb) => {
+    adminEndpoint(this.nsp, 'list.supported.operations', cb => {
       try {
         cb(null, this.supportedOperationsList);
       } catch (e) {
@@ -759,8 +1247,8 @@ class Events extends Core {
 
     adminEndpoint(this.nsp, 'test.event', async (eventId, cb) => {
       try {
-        const username = sample(['short', 'someFreakingLongUsername', generateUsername()]);
-        const recipient = sample(['short', 'someFreakingLongUsername', generateUsername()]);
+        const username = sample(['technosterone']);
+        const recipient = sample(['technosterone']);
         const months = _.random(0, 99, false);
         const attributes = {
           test:   true,
@@ -781,26 +1269,32 @@ class Events extends Core {
             bot:         _.random(0, 1, false) === 0,
             owner:       _.random(0, 1, false) === 0,
           },
-          subStreakShareEnabled:   _.random(0, 1, false) === 0,
-          subStreak:               _.random(10, 99, false),
-          subStreakName:           getLocalizedName(_.random(10, 99, false), 'core.months'),
+          subStreakShareEnabled: _.random(0, 1, false) === 0,
+          subStreak:             _.random(10, 99, false),
+          subStreakName:         getLocalizedName(
+            _.random(10, 99, false),
+            'core.months',
+          ),
           subCumulativeMonths:     _.random(10, 99, false),
-          subCumulativeMonthsName: getLocalizedName(_.random(10, 99, false), 'core.months'),
+          subCumulativeMonthsName: getLocalizedName(
+            _.random(10, 99, false),
+            'core.months',
+          ),
           months,
-          tier:                    _.random(0, 3, false),
-          monthsName:              getLocalizedName(months, translate('core.months')),
-          message:                 sample(['', 'Lorem Ipsum Dolor Sit Amet']),
-          viewers:                 _.random(0, 9999, false),
-          bits:                    _.random(1, 1000000, false),
-          duration:                sample([30, 60, 90, 120, 150, 180]),
-          reason:                  sample(['', 'Lorem Ipsum Dolor Sit Amet']),
-          command:                 '!testcommand',
-          count:                   _.random(0, 9999, false),
-          method:                  _.random(0, 1, false) === 0 ? 'Twitch Prime' : '',
-          amount:                  _.random(0, 9999, true).toFixed(2),
-          currency:                sample(['CZK', 'USD', 'EUR']),
-          currencyInBot:           mainCurrency.value,
-          amountInBotCurrency:     _.random(0, 9999, true).toFixed(2),
+          tier:                _.random(0, 3, false),
+          monthsName:          getLocalizedName(months, translate('core.months')),
+          message:             sample(['', 'Lorem Ipsum Dolor Sit Amet']),
+          viewers:             _.random(0, 9999, false),
+          bits:                _.random(1, 1000000, false),
+          duration:            sample([30, 60, 90, 120, 150, 180]),
+          reason:              sample(['', 'Lorem Ipsum Dolor Sit Amet']),
+          command:             '!testcommand',
+          count:               _.random(0, 9999, false),
+          method:              _.random(0, 1, false) === 0 ? 'Twitch Prime' : '',
+          amount:              _.random(0, 9999, true).toFixed(2),
+          currency:            sample(['CZK', 'USD', 'EUR']),
+          currencyInBot:       mainCurrency.value,
+          amountInBotCurrency: _.random(0, 9999, true).toFixed(2),
         };
 
         const event = await getRepository(Event).findOne({
@@ -819,9 +1313,14 @@ class Events extends Core {
               const recipientis = attributes.recipientis;
               _.merge(attributes, flatten({ recipientis }));
             }
-            const isOperationSupported = typeof this.supportedOperationsList.find((o) => o.id === operation.name) !== 'undefined';
+            const isOperationSupported
+              = typeof this.supportedOperationsList.find(
+                o => o.id === operation.name,
+              ) !== 'undefined';
             if (isOperationSupported) {
-              const foundOp = this.supportedOperationsList.find((o) =>  o.id === operation.name);
+              const foundOp = this.supportedOperationsList.find(
+                o => o.id === operation.name,
+              );
               if (foundOp) {
                 foundOp.fire(operation.definitions, attributes);
               }
@@ -837,7 +1336,13 @@ class Events extends Core {
 
     adminEndpoint(this.nsp, 'events::save', async (event, cb) => {
       try {
-        cb(null, await getRepository(Event).save({ ...event, operations: event.operations.filter(o => o.name !== 'do-nothing') }));
+        cb(
+          null,
+          await getRepository(Event).save({
+            ...event,
+            operations: event.operations.filter(o => o.name !== 'do-nothing'),
+          }),
+        );
       } catch (e) {
         cb(e.stack, event);
       }
@@ -856,17 +1361,20 @@ class Events extends Core {
     }
 
     try {
-      for (const event of (await getRepository(Event)
+      for (const event of await getRepository(Event)
         .createQueryBuilder('event')
         .where('event.name = :event1', { event1: 'command-send-x-times' })
         .orWhere('event.name = :event2', { event2: 'keyword-send-x-times ' })
-        .getMany())) {
+        .getMany()) {
         if (_.isNil(_.get(event, 'triggered.fadeOutInterval', null))) {
           // fadeOutInterval init
           event.triggered.fadeOutInterval = Date.now();
           await getRepository(Event).save(event);
         } else {
-          if (Date.now() - event.triggered.fadeOutInterval >= Number(event.definitions.fadeOutInterval) * 1000) {
+          if (
+            Date.now() - event.triggered.fadeOutInterval
+            >= Number(event.definitions.fadeOutInterval) * 1000
+          ) {
             // fade out commands
             if (event.name === 'command-send-x-times') {
               if (!_.isNil(_.get(event, 'triggered.runEveryXCommands', null))) {
@@ -875,7 +1383,9 @@ class Events extends Core {
                 }
 
                 event.triggered.fadeOutInterval = Date.now();
-                event.triggered.runEveryXCommands = event.triggered.runEveryXCommands - Number(event.definitions.fadeOutXCommands);
+                event.triggered.runEveryXCommands
+                  = event.triggered.runEveryXCommands
+                  - Number(event.definitions.fadeOutXCommands);
                 await getRepository(Event).save(event);
               }
             } else if (event.name === 'keyword-send-x-times') {
@@ -885,7 +1395,9 @@ class Events extends Core {
                 }
 
                 event.triggered.fadeOutInterval = Date.now();
-                event.triggered.runEveryXKeywords = event.triggered.runEveryXKeywords - Number(event.definitions.fadeOutXKeywords);
+                event.triggered.runEveryXKeywords
+                  = event.triggered.runEveryXKeywords
+                  - Number(event.definitions.fadeOutXKeywords);
                 await getRepository(Event).save(event);
               }
             }
